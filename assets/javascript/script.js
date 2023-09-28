@@ -1,6 +1,5 @@
 let map;
 let service;
-let infowindow;
 
 function initMap() {
     // location of Sydney
@@ -41,11 +40,16 @@ function createMarker(place) {
         position: place.geometry.location,
     });
 
-    infoWindow = new google.maps.InfoWindow();
+    var infowindow = new google.maps.InfoWindow(
+        {
+            content: place.name,
+        }
+    );
     marker.addListener("click", () => {
-        console.log(place.name);
-        // infowindow.setContent(place.name || "");
-        // infowindow.open(map);
+        infowindow.open({
+            anchor: marker,
+            map,
+        });
     })
 }
 

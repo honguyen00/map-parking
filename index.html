@@ -18,7 +18,7 @@
 
     <main class="main-container" id="main-container">
         <side class="search-container" id="search-container">
-            <div class="search-option" id="search-option">Seaarch Options</div>
+            <div class="search-option" id="search-option">Search Options</div>
             <button class="search-Btn" id="search-Btn">Search</button>
             <div class="search-result" id="seaarch-result">Search Results</div>
             <div class="history" id="history">View Previous Searches</div>
@@ -26,9 +26,13 @@
         </side>
 
         <article class="map-container" id="map-container">
+            <div id="map"></div>
         </article>
     </main>
-
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5Zx1uReveYAhTFw1btOcdMgIMCY7GVNE&callback=initMap&libraries=places&v=weekly"
+      defer
+    ></script>
     <script src="./assets/javascript/script.js"></script>
 </body>
 
