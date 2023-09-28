@@ -1,13 +1,12 @@
 let map;
 let service;
+let infowindow;
 
-async function initMap() {
+function initMap() {
     // location of Sydney
     const initialPositon = { lat: -33.865, lng:  151.210 };
-    const { Map } = await google.maps.importLibrary("maps");
-    const { PlacesService } = await google.maps.importLibrary("places");
 
-    map = new Map(document.getElementById("map"), {
+    map = new google.maps.Map(document.getElementById("map"), {
         zoom: 8,
         center: initialPositon,
         mapId: "default_map",
@@ -18,11 +17,11 @@ async function initMap() {
     const request = {
         keyword: "parking",
         location: initialPositon,
-        radius: 10000,
+        radius: 50000,
         type: 'parking',
-    };  
+    }; 
 
-    service = new PlacesService(map);
+    service = new google.maps.places.PlacesService(map);
     service.nearbySearch(request, (results, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && results) {
             for (let i = 0; i < results.length; i++) {
@@ -30,25 +29,23 @@ async function initMap() {
             }
         }
         map.setCenter(results[0].geometry.location);
-        map.setZoom(10);
+        map.setZoom(15);
     })
 }
 
-async function createMarker(place) {
-    const { InfoWindow } = await google.maps.importLibrary("maps");
-    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+function createMarker(place) {
     if (!place.geometry || !place.geometry.location) return;
 
-    const marker = new AdvancedMarkerElement({
+    const marker = new google.maps.Marker({
         map: map,
         position: place.geometry.location,
     });
 
-    var infowindow = new InfoWindow();
-
+    infoWindow = new google.maps.InfoWindow();
     marker.addListener("click", () => {
-        infowindow.setContent(place.name || "");
-        infowindow.open(map);
+        console.log(place.name);
+        // infowindow.setContent(place.name || "");
+        // infowindow.open(map);
     })
 }
 
