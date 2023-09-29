@@ -3,6 +3,10 @@ let service;
 let infoWindow;
 let markers = [];
 
+$(function () {
+    window.initMap = initMap;
+})
+
 
 function initMap() {
     const location = {
@@ -132,5 +136,3 @@ function createMarker(place) {
     );
     marker.addListener("dblclick", searchParkingAroundRadius, {passive: true})
 }
-
-window.initMap = initMap;
