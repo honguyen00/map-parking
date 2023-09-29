@@ -40,8 +40,15 @@ html, body {
 }
 
 #map {
-    height: 400px;
-    width: 600px;
+    height: 500px;
+    width: 700px;
     z-index: 1;
     margin: 100px auto;
+}
+
+.custom-map-control-button {
+    height: 3rem;
+    margin: 1rem;
+    border-radius: 5px;
+    padding: auto;
 }
