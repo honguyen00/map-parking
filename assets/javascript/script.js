@@ -26,6 +26,11 @@ function initMap() {
     map.controls[google.maps.ControlPosition.TOP_CENTER].push(currentLocationButton[0]);
     currentLocationButton.on("click", getCurrentPos);
     service = new google.maps.places.PlacesService(map);
+    map.addListener('click', (event) => {
+        if (event.placeId) {
+            event.stop();
+        }
+    })
 }
 
 function getCurrentPos() {
@@ -75,7 +80,8 @@ function searchParkingAroundRadius(position) {
                     setTimeout(dropMarker(i), i*100);
                     // addResult(results[i], i);
                 }
-
+                map.setCenter(markers[0].position);
+                map.setZoom(14)
             }
         })
     }
@@ -124,7 +130,7 @@ function createMarker(place) {
             content: "{ "+ place.lat + ", " + place.lng + "}",
         }
     );
-    marker.addListener("dbclick", searchParkingAroundRadius, {passive: true})
+    marker.addListener("dblclick", searchParkingAroundRadius, {passive: true})
 }
 
 window.initMap = initMap;
