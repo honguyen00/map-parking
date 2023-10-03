@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 * {
+=======
+*,
+*:before,
+*:after {
+>>>>>>> 0b272952869b73686903874aa1217c5c0d23663f
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -14,7 +20,11 @@ body {
   font-family: sans-serif;
 }
 
+<<<<<<< HEAD
 h1,
+=======
+​h1,
+>>>>>>> 0b272952869b73686903874aa1217c5c0d23663f
 h2,
 h3,
 h4,
@@ -23,7 +33,11 @@ h6 {
   font-size: 100%;
 }
 
+<<<<<<< HEAD
 input,
+=======
+​input,
+>>>>>>> 0b272952869b73686903874aa1217c5c0d23663f
 select,
 option,
 optgroup,
@@ -35,7 +49,18 @@ code {
   font-family: inherit;
 }
 
+<<<<<<< HEAD
 ol,
 ul {
   list-style: none;
 }
+=======
+​ol,
+ul {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+}
+>>>>>>> 0b272952869b73686903874aa1217c5c0d23663f
