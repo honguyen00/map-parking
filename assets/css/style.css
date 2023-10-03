@@ -1,28 +1,3 @@
-<<<<<<< HEAD
-.search-container {
-    display: flex;
-}
-
-.filter-Btn {
-    display: flex;
-    justify-content: right;
-    cursor: pointer;
-    border: 1px solid black;
-    padding: 5px;
-    text-decoration: none;
-    border-radius: 5%;
-    color: black;
-    background-color: beige;
-}
-
-.filter-Btn:hover {
-    background-color: bisque;
-}
-
-.hide {
-    display: none;
-}
-=======
 /* Declare all variables for later use */
 :root {
     --font-family-sans-serif: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
@@ -58,4 +33,27 @@ main {
     padding: 0 0.5rem;
     background-color: #fff;
 }
->>>>>>> 0b272952869b73686903874aa1217c5c0d23663f
+
+.search-container {
+    display: flex;
+}
+
+.filter-Btn {
+    display: flex;
+    justify-content: right;
+    cursor: pointer;
+    border: 1px solid black;
+    padding: 5px;
+    text-decoration: none;
+    border-radius: 5%;
+    color: black;
+    background-color: beige;
+}
+
+.filter-Btn:hover {
+    background-color: bisque;
+}
+
+.hide {
+    display: none;
+}
