@@ -1,0 +1,23 @@
+.search-container {
+    display: flex;
+}
+
+.filter-Btn {
+    display: flex;
+    justify-content: right;
+    cursor: pointer;
+    border: 1px solid black;
+    padding: 5px;
+    text-decoration: none;
+    border-radius: 5%;
+    color: black;
+    background-color: beige;
+}
+
+.filter-Btn:hover {
+    background-color: bisque;
+}
+
+.hide {
+    display: none;
+}
