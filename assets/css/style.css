@@ -60,7 +60,7 @@ side {
 #search-bar {
     border: 1px solid currentColor;
     border-radius: 8px;
-    padding: 5px 26px 5px 26px;
+    padding: 5px 60px 5px 5px;
     align-items: center;
     justify-content: space-between;
     position: relative;
@@ -73,7 +73,7 @@ side {
     min-height: 24px;
     position: absolute;
     top: 0.5rem;
-    right: 0;
+    right: 30px;
     border-radius: 50%;
 }
 
@@ -83,10 +83,10 @@ side {
     outline: none;
 }
 
-#search-bar i {
+#search-bar .search-icon {
     position: absolute;
-    top: 0.6rem;
-    left: 0;
+    top: 0.7rem;
+    right: 4px;
 }
 
 input[type="text"] {
@@ -111,7 +111,6 @@ input[type="text"]::placeholder {
 i {
     font-size: 2rem;
 }
-    
 
 #map {
     height: 100%;

@@ -42,9 +42,11 @@ async function initMap() {
     map.addListener('click', (event) => {
         if (event.placeId) {
             event.stop();
-            
             console.log(event)
         }
+    });
+    infoWindow1 = new google.maps.InfoWindow({
+        content: document.getElementById("infowindow")
     })
 }
 
@@ -120,7 +122,8 @@ async function searchParkingAroundRadius(position) {
                     });
 
                     markers[i].placeResult = results[i];
-                    markers[i].addListener("click", showParkingInfo);
+                    // markers[i].addListener("click", showParkingInfo);
+                    google.maps.event.addListener(markers[i], "click", showParkingInfo)
                     setTimeout(dropMarker(i), i*100);
                     addResult(results[i], i);
                 }
@@ -179,17 +182,23 @@ function showParkingInfo() {
             return;
         }
         console.log(place)
-        var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
-        var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>")
-        var placeAddress = $("<p>Address: " + place.formatted_address + "</p>");
-        var infoDiv = $("<div class='infowindow'>")[0];
-        infoDiv.append(placeIcon[0], placeName[0], placeAddress[0]);
-        infoWindow1 = new google.maps.InfoWindow({
-            content: infoDiv,
-        })
         infoWindow1.open(map, marker);
-        
+        buildIWContent(place);
     })
+    google.maps.event.addListener(map, "click", function(event) {
+        infoWindow1.close();
+    });
+}
+
+function buildIWContent(place) {
+    var infoDiv = $("#infowindow");
+    if (infoDiv.children()) {
+        infoDiv.empty();
+    }
+    var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
+    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>")
+    var placeAddress = $("<p>Address: " + place.vicinity + "</p>");
+    infoDiv.append(placeIcon[0], placeName[0], placeAddress[0]);
 }
 
 async function hightlightMarker(event) {
