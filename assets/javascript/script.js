@@ -10,8 +10,9 @@ $(function () {
 })
 
 // declare map, infoWindow, and service using google.api
-function initMap() {
+async function initMap() {
     // set initial location to be Australia
+    const { PinElement } = await google.maps.importLibrary("marker")
     const location = {
         au: {
             center: { lat: -25.3, lng: 133.8 },
@@ -42,6 +43,16 @@ function initMap() {
             
             console.log(event)
         }
+    })
+    defaultpinBackground = new PinElement({
+        background: "#031cfc",
+        borderColor: "black",
+        glyphColor: "white",
+    })
+    onfocuspinBackground = new PinElement({
+        background: "#031cfc",
+        borderColor: "white",
+        glyphColor: "black",
     })
 }
 
@@ -90,30 +101,36 @@ function createMarker(place) {
     marker.addListener("dblclick", searchParkingAroundRadius, {passive: true})
 }
 
-function searchParkingAroundRadius(position) {
+async function searchParkingAroundRadius(position) {
     if (typeof position == String) {
         // console.log("Is a string");
     }
     else {
+        const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
         var location = position.latLng.toJSON();
         const search = {
             location: {lat: location["lat"], lng: location["lng"]},
             radius: 1000,
-            keyword: "parking",
+            keyword: "car park",
+            type: 'parking',
         };
         service.nearbySearch(search, (results, status, pagination) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && results) {
                 clearResults();
                 clearMarkers();
                 // console.log(results);
-                cposn
                 for (var i=0; i<results.length; i++) {
                     const markerLetter = String.fromCharCode("A".charCodeAt(0) + (i % 26));
-                    markers[i] = new google.maps.Marker({
+                    const  pinBackground = new PinElement({
+                        background: "#031cfc",
+                        borderColor: "white",
+                        glyphColor: "black",
+                    })
+                    defaultpinBackground = pinBackground;
+                    markers[i] = new AdvancedMarkerElement({
                         position: results[i].geometry.location,
-                        animation: google.maps.Animation.DROP,
-                        icon: "./assets/images/map-marker-blue.png",
                         title: markerLetter + ". " + results[i].name,
+                        content: pinBackground.element,
                     });
 
                     markers[i].placeResult = results[i];
@@ -181,13 +198,28 @@ function showParkingInfo() {
     })
 }
 
-function hightlightMarker(event) {
+async function hightlightMarker(event) {
     var i = $(event.target).parent().index();
-    if (markers[i].getAnimation() !== null) {
-        markers[i].setAnimation(null);
+    const { PinElement } = await google.maps.importLibrary(
+        "marker",
+      ); 
+    const  defaultpinBackground = new PinElement({
+        background: "#031cfc",
+        borderColor: "white",
+        glyphColor: "black",
+        scale: 1,
+    })
+    const  onfocuspinBackground = new PinElement({
+        background: "#031cfc",
+        borderColor: "black",
+        glyphColor: "white",
+        scale: 1.2,
+    })
+    if ($(markers[i].content).children().eq(0).children().eq(0).children().eq(0).attr("fill") == "white") {
+        markers[i].content = onfocuspinBackground.element;
     }
     else {
-        markers[i].setAnimation(google.maps.Animation.BOUNCE);
+        markers[i].content = defaultpinBackground.element;
     }
 }
 
