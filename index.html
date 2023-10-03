@@ -1,32 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./assets/css/jass.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- font for icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <!-- icons link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- We don't need jass.css since we are going to use tailwind css anyway, would rather include reset.css instead to make sure that our design is consistent in all browser -->
+    <link rel="stylesheet" href="./assets/css/reset.css">
     <link rel="stylesheet" href="./assets/css/style.css">
-    <title>Park with Access</title>
+    <title>Parking with Access</title>
 </head>
 
 <body>
-    <header class="header">
-        <h1>Park with Access</h1>
+    <header class="header flex flex-row justify-between items-center p-4">
+        <h1 class="text-3xl md:text-4xl lg:text-6xl text-left" onclick="window.location.reload()">Parking with Access</h1>
+        <a href="https://github.com/honguyen00/map-parking">About us</a>
     </header>
 
-    <main class="main-container" id="main-container">
-        <side class="search-container" id="search-container">
-            <div class="search-option" id="search-option">Search Options</div>
-            <button class="search-Btn" id="search-Btn">Search</button>
-            <div class="search-result" id="seaarch-result">Search Results</div>
-            <div class="history" id="history">View Previous Searches</div>
-            </div>
+    <main class="main-container flex flex-col md:flex-row">
+        <side class="search-container w-full md:w-1/3 lg:w-1/4 xl:w-1/5">
+            <form id="search-bar">
+                <i class="fa-solid fa-magnifying-glass-location"></i>
+                <input type="text" id="search-address" placeholder="Search location"/>
+                <button id="filter">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"></path></svg>
+                </button>
+            </form>
+            <section>
+                <div class="history" id="history" style="display: none;">View Previous Searches</div>
+                <div class="search-result w-100">
+                    <table class="min-w-full" id="result-table">
+                        <tbody id="results"></tbody>
+                    </table>
+                </div>
+                
+            </section>
         </side>
-
-        <article class="map-container" id="map-container">
+        <article class="map-container w-full h-full md:w-2/3 lg:w-3/4 xl:w-4/5" id="map-container">
+            <div id="map"></div>
         </article>
     </main>
-
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA5Zx1uReveYAhTFw1btOcdMgIMCY7GVNE&callback=initMap&libraries=places&v=weekly"
+      defer
+    ></script>
+    <!-- <script>
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+          key: "AIzaSyA5Zx1uReveYAhTFw1btOcdMgIMCY7GVNE",
+          v: "weekly",
+          // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+          // Add other bootstrap parameters as needed, using camel case.
+        });
+      </script> -->
     <script src="./assets/javascript/script.js"></script>
 </body>
 
