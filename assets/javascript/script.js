@@ -19,7 +19,8 @@ async function initMap() {
         au: {
             center: { lat: -25.3, lng: 133.8 },
             zoom: 4,
-      }}
+        }
+    }
     // assign a new map and render the map to $('#map') element
     map = new google.maps.Map(document.getElementById("map"), {
         zoom: location.au.zoom,
@@ -55,15 +56,15 @@ function getCurrentPos() {
     // if browser have built-in method to get user location
     if (navigator.geolocation) {
         // browser will prompt user to allow access to their location
-        navigator.geolocation.getCurrentPosition( 
+        navigator.geolocation.getCurrentPosition(
             // if user allow, we get a position
             (position) => {
-            const pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-            }
-            // create a marker with lat and lng from said postion
-            createLocation(pos);
+                const pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                }
+                // create a marker with lat and lng from said postion
+                createLocation(pos);
             },
             // if user block, no positon, give error
             () => {
@@ -86,7 +87,7 @@ function createLocation(place) {
         position: place,
         animation: google.maps.Animation.DROP,
     });
-    marker.addListener("dblclick", searchParkingAroundRadius, {passive: true})
+    marker.addListener("dblclick", searchParkingAroundRadius, { passive: true })
 }
 
 async function searchParkingAroundRadius(position) {
@@ -97,7 +98,7 @@ async function searchParkingAroundRadius(position) {
         const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
         var location = position.latLng.toJSON();
         const search = {
-            location: {lat: location["lat"], lng: location["lng"]},
+            location: { lat: location["lat"], lng: location["lng"] },
             radius: 1000,
             keyword: "car park",
             type: 'parking',
@@ -107,9 +108,9 @@ async function searchParkingAroundRadius(position) {
                 clearResults();
                 clearMarkers();
                 // console.log(results);
-                for (var i=0; i<results.length; i++) {
+                for (var i = 0; i < results.length; i++) {
                     const markerLetter = String.fromCharCode("A".charCodeAt(0) + (i % 26));
-                    const  pinBackground = new PinElement({
+                    const pinBackground = new PinElement({
                         background: "#031cfc",
                         borderColor: "white",
                         glyphColor: "black",
@@ -137,9 +138,9 @@ async function searchParkingAroundRadius(position) {
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
     infoWindow.setContent(
-      browserHasGeolocation
-        ? "Error: The Geolocation service failed."
-        : "Error: Your browser doesn't support geolocation.",
+        browserHasGeolocation
+            ? "Error: The Geolocation service failed."
+            : "Error: Your browser doesn't support geolocation.",
     );
     infoWindow.open(map);
 }
@@ -152,7 +153,7 @@ function dropMarker(i) {
 }
 
 function clearMarkers() {
-    for (let i = 0; i<markers.length; i++) {
+    for (let i = 0; i < markers.length; i++) {
         if (markers[i]) {
             markers[i].setMap(null);
         }
@@ -177,7 +178,7 @@ function clearResults() {
 
 function showParkingInfo() {
     const marker = this;
-    service.getDetails({placeId: marker.placeResult.place_id}, (place, status) => {
+    service.getDetails({ placeId: marker.placeResult.place_id }, (place, status) => {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
         }
@@ -209,14 +210,14 @@ async function hightlightMarker(event) {
     }
     const { PinElement } = await google.maps.importLibrary(
         "marker",
-      ); 
-    const  defaultpinBackground = new PinElement({
+    );
+    const defaultpinBackground = new PinElement({
         background: "#031cfc",
         borderColor: "white",
         glyphColor: "black",
         scale: 1,
     })
-    const  onfocuspinBackground = new PinElement({
+    const onfocuspinBackground = new PinElement({
         background: "#031cfc",
         borderColor: "black",
         glyphColor: "white",
@@ -232,3 +233,56 @@ async function hightlightMarker(event) {
 
 resultTable.on("mouseover", hightlightMarker)
 resultTable.on("mouseout", hightlightMarker)
+
+
+let filterEl = document.getElementById('filter-Btn');
+let searchOptionEl = document.querySelector('.search-option');
+let saveEl = document.querySelector('.save-Btn');
+let cancelEl = document.querySelector('.cancel-Btn');
+
+filterEl.addEventListener("click", function (event) {
+    event.preventDefault();
+
+    searchOptionEl.classList.remove('hide');
+});
+
+cancelEl.addEventListener("click", function () {
+    searchOptionEl.classList.add('hide');
+});
+
+saveEl.addEventListener("click", function () {
+    let freeEl = document.querySelector('#free');
+    let paidEl = document.querySelector('#paid');
+    let accessibleEl = document.querySelector('#accessible');
+
+    let fiveEl = document.querySelector('#five');
+    let tenEl = document.querySelector('#ten');
+    let fiftenEl = document.querySelector('#fiften');
+    let twentyEl = document.querySelector('#twenty');
+
+    if (freeEl.checked === true) {
+        console.log(freeEl.value);
+    };
+
+    if (paidEl.checked === true) {
+        console.log(paidEl.value);
+    };
+
+    if (accessibleEl.checked === true) {
+        console.log(accessibleEl.value);
+    };
+
+    let radius;
+    if (fiveEl.checked === true) {
+        radius = fiveEl.value
+    } else if (tenEl.checked === true) {
+        radius = tenEl.value
+    } else if (fiftenEl.checked === true) {
+        radius = fiftenEl.value
+    } else {
+        radius = twentyEl.value
+    }
+    console.log(radius);
+
+    searchOptionEl.classList.add('hide');
+});
