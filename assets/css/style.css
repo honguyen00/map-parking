@@ -17,6 +17,17 @@ body {
     font-family: 'Helvetica', sans-serif; /* Added font-family */
 }
 
+.hero {
+    height: 400px; /* Adjust the height as needed */
+    background: url('https://assets-au-01.kc-usercontent.com/be08d7b0-97a1-02f9-2be6-a0c139c3c337/5e63d65d-e59e-4777-8877-be3bda662be3/20161110_SDP_10602.jpg?w=2048&fm=jpg&auto=format') center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff; /* Set text color */
+    font-size: 2rem; /* Set font size */
+}
+
 main {
     height: 89%;
     display: flex;
