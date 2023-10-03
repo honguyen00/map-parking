@@ -67,7 +67,7 @@ side {
     position: relative;
 }
 
-#search-bar #filter {
+#search-bar #filter-Btn {
     color: #444746;
     overflow: hidden;
     min-width: 24px;
@@ -78,7 +78,7 @@ side {
     border-radius: 50%;
 }
 
-#search-bar #filter:focus {
+#search-bar #filter-Btn:focus {
     box-shadow: 0 0 3px 0 #1183d6;
     border-color: #1183d6;
     outline: none;
