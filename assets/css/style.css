@@ -2,27 +2,142 @@
 :root {
     --font-family-sans-serif: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
     --font-family-monospace: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --neon-blue: #97E1ED;
+    --wheat-field: #F4F2D4;
+    --gray-blue: #44536A;
+    --gold: #EFE79E;
+    --gray: #D3DCDA;
+    --river-bed: #48555B;
+    --orange: #F38950;
+    --whiskey:  #E88553;
 }
 
 /* ================================================================ */
 html  {
     height: 100%; width: 100%;
+    font-size: 62.5%;
 }
+
 
 body {
     height: 100%;
-    background-color: #44536A;
+    background-color: var(--gray-blue);
     margin: 0;
+    color: black;
+}
+
+header {
+    color: var(--whiskey);
+    font-weight: bold;
 }
 
 main {
-    height: 89%;
+    height: 86vh;
+    background-color: var(--gray);
+}
+
+a {
+    font-size: 1.5rem;
+}
+
+td {
+    font-size: 1.5rem;
+}
+
+a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+h1:hover {
+    cursor: pointer;
+}
+
+side {
+    padding: 4px;
+}
+
+
+
+#search-bar {
+    border: 1px solid currentColor;
+    border-radius: 8px;
+    padding: 5px 26px 5px 26px;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+#search-bar #filter {
+    color: #444746;
+    overflow: hidden;
+    min-width: 24px;
+    min-height: 24px;
+    position: absolute;
+    top: 0.5rem;
+    right: 0;
+    border-radius: 50%;
+}
+
+#search-bar #filter:focus {
+    box-shadow: 0 0 3px 0 #1183d6;
+    border-color: #1183d6;
+    outline: none;
+}
+
+#search-bar i {
+    position: absolute;
+    top: 0.6rem;
+    left: 0;
+}
+
+input[type="text"] {
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    color: inherit;
+    overflow: hidden;
+    width: 100%;
+}
+
+input[type="text"]:focus {
+    box-shadow: 0 0 3px 0 #1183d6;
+    border-color: #1183d6;
+    outline: none;
+}
+
+input[type="text"]::placeholder {
+    color: #bbb;
+}
+
+i {
+    font-size: 2rem;
 }
 
 #map {
     height: 100%;
     width: 100%;
     z-index: 1;
+}
+
+#results:hover {
+    cursor: pointer;
+}
+
+#results {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    row-gap: 2px;
+}
+td {
+    overflow: hidden;
+    white-space: normal;
+}
+
+td:hover {
+    font-style: italic;
+    text-decoration: underline;
 }
 
 .custom-map-control-button {
@@ -32,4 +147,5 @@ main {
     font-size: medium;
     padding: 0 0.5rem;
     background-color: #fff;
+    color: black;
 }
