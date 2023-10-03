@@ -61,33 +61,33 @@ side {
 #search-bar {
     border: 1px solid currentColor;
     border-radius: 8px;
-    padding: 5px 26px 5px 26px;
+    padding: 5px 60px 5px 5px;
     align-items: center;
     justify-content: space-between;
     position: relative;
 }
 
-#search-bar #filter {
+#search-bar #filter-Btn {
     color: #444746;
     overflow: hidden;
     min-width: 24px;
     min-height: 24px;
     position: absolute;
     top: 0.5rem;
-    right: 0;
+    right: 30px;
     border-radius: 50%;
 }
 
-#search-bar #filter:focus {
+#search-bar #filter-Btn:focus {
     box-shadow: 0 0 3px 0 #1183d6;
     border-color: #1183d6;
     outline: none;
 }
 
-#search-bar i {
+#search-bar .search-icon {
     position: absolute;
-    top: 0.6rem;
-    left: 0;
+    top: 0.7rem;
+    right: 4px;
 }
 
 input[type="text"] {
@@ -112,7 +112,6 @@ input[type="text"]::placeholder {
 i {
     font-size: 2rem;
 }
-
 
 #map {
     height: 100%;

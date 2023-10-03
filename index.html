@@ -27,7 +27,6 @@
     <main class="main-container flex flex-col md:flex-row">
         <side class="search-container w-full md:w-1/3 lg:w-1/4 xl:w-1/5">
             <form id="search-bar">
-                <i class="fa-solid fa-magnifying-glass-location"></i>
                 <input type="text" id="search-address" placeholder="Search location" />
                 <button id="filter-Btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -35,6 +34,9 @@
                             d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z">
                         </path>
                     </svg>
+                </button>
+                <button class="search-icon">
+                    <i class="fa-solid fa-magnifying-glass-location"></i>
                 </button>
 
                 <!-- Modal for search options -->
@@ -131,6 +133,10 @@
         <article class="map-container w-full h-full md:w-2/3 lg:w-3/4 xl:w-4/5" id="map-container">
             <div id="map"></div>
         </article>
+        <div style="display: none;">
+            <div id="infowindow">
+            </div>
+        </div>
     </main>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script
