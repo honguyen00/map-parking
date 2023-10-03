@@ -44,7 +44,7 @@ td {
     font-size: 1.5rem;
 }
 
-a:hover {
+header a:hover {
     color: white;
     text-decoration: underline;
 }
@@ -128,14 +128,14 @@ i {
     margin-top: 2rem;
     display: flex;
     flex-direction: column;
-    row-gap: 2px;
+    row-gap: 5px;
 }
 td {
     overflow: hidden;
     white-space: normal;
 }
 
-td:hover {
+tr:hover {
     font-style: italic;
     text-decoration: underline;
 }
@@ -148,4 +148,10 @@ td:hover {
     padding: 0 0.5rem;
     background-color: #fff;
     color: black;
+}
+
+.parkingIcon {
+    max-height: 20px;
+    margin-right: 5px;
+    margin-bottom: 5px;
 }

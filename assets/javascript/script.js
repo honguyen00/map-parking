@@ -3,6 +3,7 @@ let service;
 let infoWindow;
 let markers = [];
 var resultTable = $("#results");
+var infoWindow1;
 
 // run after loading all html elements
 $(function () {
@@ -12,7 +13,8 @@ $(function () {
 // declare map, infoWindow, and service using google.api
 async function initMap() {
     // set initial location to be Australia
-    const { PinElement } = await google.maps.importLibrary("marker")
+    const { PinElement } = await google.maps.importLibrary("marker");
+    const { InfoWindow } = await google.maps.importLibrary("maps")
     const location = {
         au: {
             center: { lat: -25.3, lng: 133.8 },
@@ -44,16 +46,6 @@ async function initMap() {
             console.log(event)
         }
     })
-    defaultpinBackground = new PinElement({
-        background: "#031cfc",
-        borderColor: "black",
-        glyphColor: "white",
-    })
-    onfocuspinBackground = new PinElement({
-        background: "#031cfc",
-        borderColor: "white",
-        glyphColor: "black",
-    })
 }
 
 // function to get the current position of user from the browser
@@ -69,7 +61,7 @@ function getCurrentPos() {
                 lng: position.coords.longitude,
             }
             // create a marker with lat and lng from said postion
-            createMarker(pos);
+            createLocation(pos);
             },
             // if user block, no positon, give error
             () => {
@@ -83,7 +75,7 @@ function getCurrentPos() {
     }
 }
 
-function createMarker(place) {
+function createLocation(place) {
     if (!place) return;
     map.setCenter(place);
     map.setZoom(12)
@@ -92,12 +84,6 @@ function createMarker(place) {
         position: place,
         animation: google.maps.Animation.DROP,
     });
-
-    infowindow = new google.maps.InfoWindow(
-        {
-            content: "{ "+ place.lat + ", " + place.lng + "}",
-        }
-    );
     marker.addListener("dblclick", searchParkingAroundRadius, {passive: true})
 }
 
@@ -177,7 +163,7 @@ function addResult(result, i) {
     rowEle.on("click", () => {
         google.maps.event.trigger(markers[i], "click")
     })
-    var resultTd = $("<td class='result-item'>" + markerLetter + ". " + result.name + "</td>");
+    var resultTd = $("<td class='result-item w-full'>" + markerLetter + ". " + result.name + "</td>");
     rowEle.append(resultTd);
     resultTable.append(rowEle);
 }
@@ -192,14 +178,26 @@ function showParkingInfo() {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
         }
-        infoWindow.open(map, marker);
-        // console.log(place);
-        // console.log(place.photos[0].getUrl());
+        console.log(place)
+        var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
+        var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>")
+        var placeAddress = $("<p>Address: " + place.formatted_address + "</p>");
+        var infoDiv = $("<div class='infowindow'>")[0];
+        infoDiv.append(placeIcon[0], placeName[0], placeAddress[0]);
+        infoWindow1 = new google.maps.InfoWindow({
+            content: infoDiv,
+        })
+        infoWindow1.open(map, marker);
+        
     })
 }
 
 async function hightlightMarker(event) {
-    var i = $(event.target).parent().index();
+    if (event.target.tagName == 'TD') {
+        var i = $(event.target).parent().index();
+    } else {
+        var i = $(event.target).index();
+    }
     const { PinElement } = await google.maps.importLibrary(
         "marker",
       ); 
@@ -223,5 +221,5 @@ async function hightlightMarker(event) {
     }
 }
 
-resultTable.on("mouseover", ".result-item", hightlightMarker)
-resultTable.on("mouseout", ".result-item", hightlightMarker)
+resultTable.on("mouseover", hightlightMarker)
+resultTable.on("mouseout", hightlightMarker)
