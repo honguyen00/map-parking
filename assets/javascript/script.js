@@ -289,6 +289,54 @@ saveEl.addEventListener("click", function () {
 
 
 
+let searchInputEl = document.querySelector('#search-address');
+let previousSearches = [];
+
+if (localStorage.getItem("previousSearches")) {
+    previousSearches = JSON.parse(localStorage.getItem("previousSearches"));
+}
+
+searchInputEl.addEventListener("click", function () {
+
+if (searchInputEl === "") {
+    return localStorage.searchHistory
+}
+
+})
+
+
+
+// if (previousSearches.indexOf(search) === -1) {
+//     previousSearches.unshift(search);
+//     if (previousSearches.length > 5) {
+//         previousSearches.pop();
+//     }
+//     localStorage.setItem("previousSearches", JSON.stringify(previousSearches));
+// }
+
+// function showPreviousSearches() {
+//     if (previousSearches.length) {
+//         const previousSearchesContainer = document.getElementById("previousSearches");
+//         previousSearchesContainer.innerHTML = previousSearchesTemplate({ search: previousSearches });
+//     }
+// }
+
+// document.addEventListener("click", function (e) {
+//     if (e.target.classList.contains("previousSearchLink")) {
+//         e.preventDefault();
+//         var search = e.target.textContent;
+//         doSearch(search);
+//     }
+// });
+
+
+
+
+
+
+
+
+
 // let previousSearches = [];
 
 // if(localStorage["previousSearches"]) {
