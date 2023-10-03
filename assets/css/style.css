@@ -2,79 +2,143 @@
 :root {
     --font-family-sans-serif: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
     --font-family-monospace: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --neon-blue: #97E1ED;
+    --wheat-field: #F4F2D4;
+    --gray-blue: #44536A;
+    --gold: #EFE79E;
+    --gray: #D3DCDA;
+    --river-bed: #48555B;
+    --orange: #F38950;
+    --whiskey:  #E88553;
 }
 
 /* ================================================================ */
 html  {
-    height: 100%;
-    width: 100%;
+    height: 100%; width: 100%;
+    font-size: 62.5%;
 }
+
 
 body {
     height: 100%;
-    background-color: #44536A;
+    background-color: var(--gray-blue);
     margin: 0;
-    font-family: 'Helvetica', sans-serif; /* Added font-family */
+    color: black;
 }
 
-.hero {
-    height: 400px; /* Adjust the height as needed */
-    background: url('https://assets-au-01.kc-usercontent.com/be08d7b0-97a1-02f9-2be6-a0c139c3c337/5e63d65d-e59e-4777-8877-be3bda662be3/20161110_SDP_10602.jpg?w=2048&fm=jpg&auto=format') center/cover;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #fff; /* Set text color */
-    font-size: 2rem; /* Set font size */
-}
-
-main {
-    height: 89%;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-}
-
-.header {
-    background-color: #4a90e2;
-    color: #fff;
-    padding: 1rem;
-    text-align: center;
-}
-
-.search-container {
-    width: 100%;
-    max-width: 320px;
-}
-
-.search-bar {
-    display: flex;
-    margin-bottom: 1rem;
-}
-
-#search-address {
-    flex-grow: 1;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.search-result, .history {
-    background-color: #f0f0f0;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
+header {
+    color: var(--whiskey);
     font-weight: bold;
 }
 
-.map-container {
-    width: 100%;
-    height: 100%;
+main {
+    height: 86vh;
+    background-color: var(--gray);
 }
+
+a {
+    font-size: 1.5rem;
+}
+
+td {
+    font-size: 1.5rem;
+}
+
+header a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+h1:hover {
+    cursor: pointer;
+}
+
+side {
+    padding: 4px;
+}
+
+
+
+#search-bar {
+    border: 1px solid currentColor;
+    border-radius: 8px;
+    padding: 5px 26px 5px 26px;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+#search-bar #filter {
+    color: #444746;
+    overflow: hidden;
+    min-width: 24px;
+    min-height: 24px;
+    position: absolute;
+    top: 0.5rem;
+    right: 0;
+    border-radius: 50%;
+}
+
+#search-bar #filter:focus {
+    box-shadow: 0 0 3px 0 #1183d6;
+    border-color: #1183d6;
+    outline: none;
+}
+
+#search-bar i {
+    position: absolute;
+    top: 0.6rem;
+    left: 0;
+}
+
+input[type="text"] {
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    color: inherit;
+    overflow: hidden;
+    width: 100%;
+}
+
+input[type="text"]:focus {
+    box-shadow: 0 0 3px 0 #1183d6;
+    border-color: #1183d6;
+    outline: none;
+}
+
+input[type="text"]::placeholder {
+    color: #bbb;
+}
+
+i {
+    font-size: 2rem;
+=======
+    
 
 #map {
     height: 100%;
     width: 100%;
     z-index: 1;
+}
+
+#results:hover {
+    cursor: pointer;
+}
+
+#results {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+}
+td {
+    overflow: hidden;
+    white-space: normal;
+}
+
+tr:hover {
+    font-style: italic;
+    text-decoration: underline;
 }
 
 .custom-map-control-button {
@@ -84,4 +148,11 @@ main {
     font-size: medium;
     padding: 0 0.5rem;
     background-color: #fff;
+    color: black;
+}
+
+.parkingIcon {
+    max-height: 20px;
+    margin-right: 5px;
+    margin-bottom: 5px;
 }
