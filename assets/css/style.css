@@ -54,10 +54,8 @@ h1:hover {
 }
 
 side {
-    padding: 4px;
+    padding: 1rem 1.5rem 1rem 1.5rem;
 }
-
-
 
 #search-bar {
     border: 1px solid currentColor;
@@ -112,7 +110,7 @@ input[type="text"]::placeholder {
 
 i {
     font-size: 2rem;
-=======
+}
     
 
 #map {
