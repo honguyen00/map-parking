@@ -223,3 +223,32 @@ async function hightlightMarker(event) {
 
 resultTable.on("mouseover", hightlightMarker)
 resultTable.on("mouseout", hightlightMarker)
+
+
+// let previousSearches = [];
+
+// if(localStorage["previousSearches"]) {
+//      previousSearches = JSON.parse(localStorage["previousSearches"]);
+// }
+
+// if(previousSearches.indexOf(search) == -1) {
+//     previousSearches.unshift(search);
+//     if(previousSearches.length > 5) { 
+//        previousSearches.pop();
+//     }
+//     localStorage["previousSearches"] = JSON.stringify(previousSearches);
+// }
+
+
+// function drawpreviousSearches() {
+//     if(previousSearches.length) {
+//         var html = previousSearchesTemplate({search:previousSearches});
+//         $("#previousSearches").html(html);
+//     }
+// }
+
+// $(document).on("click", ".previousSearchLink", function(e) {
+//     e.preventDefault();
+//     var search = $(this).text();
+//     doSearch(search);
+// });
