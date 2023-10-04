@@ -125,7 +125,7 @@ async function searchParkingAroundRadius(position) {
                     markers[i].placeResult = results[i];
                     // markers[i].addListener("click", showParkingInfo);
                     google.maps.event.addListener(markers[i], "click", showParkingInfo)
-                    setTimeout(dropMarker(i), i*100);
+                    setTimeout(dropMarker(i), i * 100);
                     addResult(results[i], i);
                 }
                 map.setCenter(markers[0].position);
@@ -186,7 +186,7 @@ function showParkingInfo() {
         infoWindow1.open(map, marker);
         buildIWContent(place);
     })
-    google.maps.event.addListener(map, "click", function(event) {
+    google.maps.event.addListener(map, "click", function (event) {
         infoWindow1.close();
     });
 }
@@ -197,7 +197,7 @@ function buildIWContent(place) {
         infoDiv.empty();
     }
     var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
-    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>")
+    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name + "</a>")
     var placeAddress = $("<p>Address: " + place.vicinity + "</p>");
     infoDiv.append(placeIcon[0], placeName[0], placeAddress[0]);
 }
@@ -288,21 +288,86 @@ saveEl.addEventListener("click", function () {
 });
 
 
+let historyListEl = document.querySelector('.historyList');
+let searchValueEl = document.getElementById('search-address');
+let searchEl = document.getElementById('search-bar');
+let historyItemEl = document.querySelector('.historyItem');
+let previousSearch = [];
 
-let searchInputEl = document.querySelector('#search-address');
-let previousSearches = [];
+searchEl.addEventListener("submit", function (event) {
+    event.preventDefault();
 
-if (localStorage.getItem("previousSearches")) {
-    previousSearches = JSON.parse(localStorage.getItem("previousSearches"));
-}
+    previousSearch.unshift(searchValueEl.value);
 
-searchInputEl.addEventListener("click", function () {
+    console.log(previousSearch);
 
-if (searchInputEl === "") {
-    return localStorage.searchHistory
-}
+    let historyHtmlList = "";
 
+    for (let i = 0; i < previousSearch.length; i++) {
+        historyHtmlList += `
+        <div class="historyItem">
+            <i class="fa-regular fa-clock"></i>
+            <p>${previousSearch[i]}</p>
+        </div>
+    `
+    // let pEl = document.createElement('p');
+    // pEl.textContent = previousSearch[i];
+    // historyItemEl.appendChild(pEl);
+    }
+
+    if (previousSearch.length > 7) {
+        previousSearch.pop();
+    }
+
+    historyListEl.innerHTML = historyHtmlList;
+
+    searchValueEl.value = "";
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// let searchInput = searchInput.value.trim();
+// let searchIconEl = document.querySelector('.search-icon');
+
+// searchIconEl.addEventListener("click", function (event) {
+//     event.preventDefault();
+
+//     localStorage.setItem("savedSearch", JSON.stringify(savedSearch));
+// })
+
+
+
+// let searchInputEl = document.querySelector('#search-address');
+// let previousSearches = [];
+
+// searchInputEl.addEventListener("click", function (event) {
+//     event.preventDefault();
+
+//     if (localStorage.getItem("previousSearches")) {
+//         previousSearches = JSON.parse(localStorage.getItem("previousSearches"));
+//     }
+
+//     if (searchInputEl === "") {
+//         return localStorage.searchHistory
+//     }
+
+// })
 
 
 
