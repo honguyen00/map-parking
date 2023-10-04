@@ -11,6 +11,8 @@
     --orange: #F38950;
     --whiskey: #E88553;
     --white: white;
+    --darkgray: darkgray;
+    --black: black; 
 }
 
 /* ================================================================ */
@@ -25,7 +27,7 @@ body {
     height: 100%;
     background-color: var(--gray-blue);
     margin: 0;
-    color: black;
+    color: var(--black);
 }
 
 header {
@@ -148,7 +150,7 @@ tr:hover {
     font-size: medium;
     padding: 0 0.5rem;
     background-color: var(--white);
-    color: black;
+    color: var(--black);
 }
 
 .parkingIcon {
@@ -168,8 +170,7 @@ tr:hover {
     width: 100%;
     border-radius: 3px;
     display: none;
-    /* border: 1px solid darkgray */
-    box-shadow: 1px 1px 0 2px darkgray;
+    box-shadow: 1px 1px 0 2px var(--darkgray);
     overflow: hidden;
 }
 

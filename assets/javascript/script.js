@@ -325,31 +325,23 @@ searchEl.addEventListener("submit", function (event) {
 })
 
 
+let addressInput = searchValueEl.value.trim();
+let searchIconEl = document.querySelector('.search-icon');
+
+searchIconEl.addEventListener("click", function (event) {
+    event.preventDefault();
+
+    if (addressInput === "") {
+        return previousSearch;
+    } else {
+        localStorage.setItem("savedSearch", addressInput);
+    }
+})
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-// let searchInput = searchInput.value.trim();
-// let searchIconEl = document.querySelector('.search-icon');
-
-// searchIconEl.addEventListener("click", function (event) {
-//     event.preventDefault();
-
-//     localStorage.setItem("savedSearch", JSON.stringify(savedSearch));
-// })
 
 
 
