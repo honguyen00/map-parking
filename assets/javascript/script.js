@@ -226,11 +226,9 @@ resultTable.on("mouseover", hightlightMarker)
 resultTable.on("mouseout", hightlightMarker)
 
 // search address functionality
-
-// Replace YOUR_GOOGLE_MAPS_API_KEY with your actual API key
 var apiKey = 'AIzaSyA5Zx1uReveYAhTFw1btOcdMgIMCY7GVNE';
 
-// Initialize Google Places API
+// function for autocomplete, Google Places API
 function initAutocomplete() {
     var input = document.getElementById('addressInput');
     var options = {
