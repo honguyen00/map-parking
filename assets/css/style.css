@@ -53,9 +53,22 @@ h1:hover {
     cursor: pointer;
 }
 
+#addressInput {
+    width: 300px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#map {
+    height: 400px;
+    margin-top: 20px;
+}
+
+
 side {
     padding: 1rem 1.5rem 1rem 1.5rem;
 }
+
 
 #search-bar {
     border: 1px solid currentColor;

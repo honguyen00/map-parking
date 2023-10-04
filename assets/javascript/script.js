@@ -238,6 +238,14 @@ function initAutocomplete() {
     };
 
     var autocomplete = new google.maps.places.Autocomplete(input, options);
+
+    // When a place is selected, show it on the map
+    autocomplete.addListener('place_changed', function () {
+        var place = autocomplete.getPlace();
+        if (place.geometry) {
+            showOnMap(place.geometry.location);
+        }
+    });
 }
 
 // Load Google Maps Places API asynchronously
@@ -248,5 +256,18 @@ function loadScript() {
     document.body.appendChild(script);
 }
 
-// Call loadScript when the page is loaded
+function showOnMap(location) {
+    var mapOptions = {
+        center: location,
+        zoom: 15
+    };
+
+    var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+    var marker = new google.maps.Marker({
+        map: map,
+        position: location
+    });
+}
+
 window.onload = loadScript;
