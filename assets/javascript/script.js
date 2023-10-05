@@ -240,16 +240,19 @@ let searchOptionEl = document.querySelector('.search-option');
 let saveEl = document.querySelector('.save-Btn');
 let cancelEl = document.querySelector('.cancel-Btn');
 
+// Adding an event listener for when user clicks on the filter button
 filterEl.addEventListener("click", function (event) {
     event.preventDefault();
 
     searchOptionEl.classList.remove('hide');
 });
 
+// Adding an event listener to hide the modal when user clicks on the cancel button
 cancelEl.addEventListener("click", function () {
     searchOptionEl.classList.add('hide');
 });
 
+// The event listener will process user's filter inputs when they click on the save button
 saveEl.addEventListener("click", function () {
     let freeEl = document.querySelector('#free');
     let paidEl = document.querySelector('#paid');
@@ -299,7 +302,10 @@ searchEl.addEventListener("submit", function (event) {
 
     previousSearch.unshift(searchValueEl.value);
 
+    localStorage.setItem("previousSearch", previousSearch);
     console.log(previousSearch);
+
+    showHistory();
 
     let historyHtmlList = "";
 
@@ -324,42 +330,33 @@ searchEl.addEventListener("submit", function (event) {
     searchValueEl.value = "";
 })
 
+function showHistory() {
+    localStorage.getItem("previousSearch", previousSearch);
+}
 
-let addressInput = searchValueEl.value.trim();
-let searchIconEl = document.querySelector('.search-icon');
-
-searchIconEl.addEventListener("click", function (event) {
-    event.preventDefault();
-
-    if (addressInput === "") {
-        return previousSearch;
-    } else {
-        localStorage.setItem("savedSearch", addressInput);
-    }
-})
+showHistory();
 
 
+// let addressInput = searchValueEl.value.trim();
+// let searchIconEl = document.querySelector('.search-icon');
 
-
-
-
-
-
-// let searchInputEl = document.querySelector('#search-address');
-// let previousSearches = [];
-
-// searchInputEl.addEventListener("click", function (event) {
+// searchIconEl.addEventListener("click", function (event) {
 //     event.preventDefault();
 
-//     if (localStorage.getItem("previousSearches")) {
-//         previousSearches = JSON.parse(localStorage.getItem("previousSearches"));
+//     if (addressInput === "") {
+//         return previousSearch;
+//     } else {
+//         localStorage.setItem("savedSearch", addressInput);
 //     }
-
-//     if (searchInputEl === "") {
-//         return localStorage.searchHistory
-//     }
-
 // })
+
+
+
+
+
+
+
+
 
 
 
