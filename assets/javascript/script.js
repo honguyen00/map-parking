@@ -286,3 +286,48 @@ saveEl.addEventListener("click", function () {
 
     searchOptionEl.classList.add('hide');
 });
+
+// search address functionality
+var apiKey = 'AIzaSyA5Zx1uReveYAhTFw1btOcdMgIMCY7GVNE';
+
+// function for autocomplete, Google Places API
+function initAutocomplete() {
+    var input = document.getElementById('search-address');
+    var options = {
+        types: ['geocode']
+    };
+
+    var autocomplete = new google.maps.places.Autocomplete(input, options);
+
+    // When a place is selected, show it on the map
+    autocomplete.addListener('place_changed', function () {
+        var place = autocomplete.getPlace();
+        if (place.geometry) {
+            showOnMap(place.geometry.location);
+        }
+    });
+}
+
+// Load Google Maps Places API asynchronously
+function loadScript() {
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://maps.googleapis.com/maps/api/js?key=' + apiKey + '&libraries=places&callback=initAutocomplete';
+    document.body.appendChild(script);
+}
+
+function showOnMap(location) {
+    var mapOptions = {
+        center: location,
+        zoom: 15
+    };
+
+    var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+    var marker = new google.maps.Marker({
+        map: map,
+        position: location
+    });
+}
+
+window.onload = loadScript;
