@@ -39,7 +39,7 @@ async function initMap() {
         }
     });
     var input = $("#search-address")[0];
-    const autocomplete = new google.maps.places.Autocomplete(input, options);
+    const autocomplete = new google.maps.places.Autocomplete(input);
     autocomplete.addListener("place_changed", ()=> {
         console.log(autocomplete.getPlace());
     })
@@ -431,44 +431,6 @@ searchEl.addEventListener("keyup", function () {
         return historyEl.classList.remove('hide');
     }
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// let addressInput = searchValueEl.value.trim();
-// let searchIconEl = document.querySelector('.search-icon');
-
-// searchIconEl.addEventListener("click", function (event) {
-//     event.preventDefault();
-
-//     if (addressInput === "") {
-//         return previousSearch;
-//     } else {
-//         localStorage.setItem("savedSearch", addressInput);
-//     }
-// })
-
 
 
 
