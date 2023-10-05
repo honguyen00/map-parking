@@ -204,10 +204,6 @@ tr:hover {
     overflow: hidden;
 }
 
-/* .search-container:focus-within .history {
-    display: block;
-} */
-
 .history h2 {
     font-size: 15px;
     padding: 10px;
