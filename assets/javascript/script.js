@@ -336,6 +336,7 @@ searchValueEl.addEventListener('click', function () {
 
 function showHistory() {
 
+    // Adding html elements into the historyList element
     historyListEl.innerHTML = '';
 
     // Creating a for loop and all the elements required for the user input
@@ -346,7 +347,7 @@ function showHistory() {
         let iconEl = document.createElement('i');
         iconEl.setAttribute('class', 'fa-regular fa-clock');
 
-        let pEl = document.createElement('p');
+        let pEl = document.createElement('button');
         pEl.textContent = previousSearch[i];
 
         newDiv.append(iconEl, pEl);
@@ -358,11 +359,35 @@ function showHistory() {
 showHistory();
 
 // Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history.
-// searchEl.addEventListener("keydown", function (event) {
-//     event.preventDefault();
+searchEl.addEventListener("keyup", function () {
 
-//     historyEl.classList.add('hide');
-// })
+    historyEl.classList.add('hide');
+
+    if (searchValueEl.value === '') {
+        return historyEl.classList.remove('hide');
+    }
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
