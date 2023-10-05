@@ -234,7 +234,7 @@ async function hightlightMarker(event) {
 resultTable.on("mouseover", hightlightMarker)
 resultTable.on("mouseout", hightlightMarker)
 
-
+// Defining the variables for the filter options
 let filterEl = document.getElementById('filter-Btn');
 let searchOptionEl = document.querySelector('.search-option');
 let saveEl = document.querySelector('.save-Btn');
@@ -290,51 +290,80 @@ saveEl.addEventListener("click", function () {
     searchOptionEl.classList.add('hide');
 });
 
-
+// Defining the variables for search history features
+let historyEl = document.querySelector('.history');
 let historyListEl = document.querySelector('.historyList');
 let searchValueEl = document.getElementById('search-address');
 let searchEl = document.getElementById('search-bar');
 let historyItemEl = document.querySelector('.historyItem');
-let previousSearch = [];
 
+// Saving the search history in local storage
+let previousSearch = JSON.parse(localStorage.getItem("previousSearch")) || [];
+
+// Adding a click event for the search button
 searchEl.addEventListener("submit", function (event) {
     event.preventDefault();
 
+    // Hide the search history feature when user clicks on the search button
+    historyEl.classList.add('hide');
+
+    // If the text input is an empty string, or is a repeat from the previous string, do not save the result in local storage
+    if (searchValueEl.value === '' || previousSearch.indexOf(searchValueEl.value) !== -1) {
+        return
+    }
+
+    // Adding the new search value to the top of the search history 
     previousSearch.unshift(searchValueEl.value);
 
-    localStorage.setItem("previousSearch", previousSearch);
-    console.log(previousSearch);
+    // Displaying the saved string lists from local storage
+    localStorage.setItem("previousSearch", JSON.stringify(previousSearch));
 
     showHistory();
 
-    let historyHtmlList = "";
-
-    for (let i = 0; i < previousSearch.length; i++) {
-        historyHtmlList += `
-        <div class="historyItem">
-            <i class="fa-regular fa-clock"></i>
-            <p>${previousSearch[i]}</p>
-        </div>
-    `
-    // let pEl = document.createElement('p');
-    // pEl.textContent = previousSearch[i];
-    // historyItemEl.appendChild(pEl);
-    }
-
+    // Only showing the last 8 search history 
     if (previousSearch.length > 7) {
         previousSearch.pop();
     }
 
-    historyListEl.innerHTML = historyHtmlList;
-
+    // Clearing the text input value once user submits
     searchValueEl.value = "";
 })
 
+// Adding a click event so that the search history feature will show up when user clicks on the text input box
+searchValueEl.addEventListener('click', function () {
+    historyEl.classList.remove('hide');
+})
+
 function showHistory() {
-    localStorage.getItem("previousSearch", previousSearch);
+
+    historyListEl.innerHTML = '';
+
+    // Creating a for loop and all the elements required for the user input
+    for (let i = 0; i < previousSearch.length; i++) {
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('historyItem');
+
+        let iconEl = document.createElement('i');
+        iconEl.setAttribute('class', 'fa-regular fa-clock');
+
+        let pEl = document.createElement('p');
+        pEl.textContent = previousSearch[i];
+
+        newDiv.append(iconEl, pEl);
+
+        historyListEl.appendChild(newDiv);
+    }
 }
 
 showHistory();
+
+// Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history.
+// searchEl.addEventListener("keydown", function (event) {
+//     event.preventDefault();
+
+//     historyEl.classList.add('hide');
+// })
+
 
 
 // let addressInput = searchValueEl.value.trim();
@@ -351,70 +380,3 @@ showHistory();
 // })
 
 
-
-
-
-
-
-
-
-
-
-// if (previousSearches.indexOf(search) === -1) {
-//     previousSearches.unshift(search);
-//     if (previousSearches.length > 5) {
-//         previousSearches.pop();
-//     }
-//     localStorage.setItem("previousSearches", JSON.stringify(previousSearches));
-// }
-
-// function showPreviousSearches() {
-//     if (previousSearches.length) {
-//         const previousSearchesContainer = document.getElementById("previousSearches");
-//         previousSearchesContainer.innerHTML = previousSearchesTemplate({ search: previousSearches });
-//     }
-// }
-
-// document.addEventListener("click", function (e) {
-//     if (e.target.classList.contains("previousSearchLink")) {
-//         e.preventDefault();
-//         var search = e.target.textContent;
-//         doSearch(search);
-//     }
-// });
-
-
-
-
-
-
-
-
-
-// let previousSearches = [];
-
-// if(localStorage["previousSearches"]) {
-//      previousSearches = JSON.parse(localStorage["previousSearches"]);
-// }
-
-// if(previousSearches.indexOf(search) == -1) {
-//     previousSearches.unshift(search);
-//     if(previousSearches.length > 5) { 
-//        previousSearches.pop();
-//     }
-//     localStorage["previousSearches"] = JSON.stringify(previousSearches);
-// }
-
-
-// function drawpreviousSearches() {
-//     if(previousSearches.length) {
-//         var html = previousSearchesTemplate({search:previousSearches});
-//         $("#previousSearches").html(html);
-//     }
-// }
-
-// $(document).on("click", ".previousSearchLink", function(e) {
-//     e.preventDefault();
-//     var search = $(this).text();
-//     doSearch(search);
-// });

@@ -169,14 +169,14 @@ tr:hover {
     background-color: var(--gray);
     width: 100%;
     border-radius: 3px;
-    display: none;
+    /* display: none; */
     box-shadow: 1px 1px 0 2px var(--darkgray);
     overflow: hidden;
 }
 
-.search-container:focus-within .history {
+/* .search-container:focus-within .history {
     display: block;
-}
+} */
 
 .history h2 {
 font-size: 15px; 

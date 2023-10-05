@@ -21,9 +21,7 @@ saveButton.addEventListener("click", function(event) {
     }
 
     //When the user clicks on search input, 
-    //The last 5 search history will appear underneath the search bar.
-
-    //Use the click event + hide class for the list
+    //The last 8 search history will appear underneath the search bar.
 
     //When the user types anything in the search input,
     //The search history will disappear, and the autocomplete will kick in. 
