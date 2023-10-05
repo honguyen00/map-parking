@@ -439,7 +439,7 @@ function showHistory() {
 
 showHistory();
 
-// Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history.
+// Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history
 searchEl.addEventListener("keyup", function () {
 
     historyEl.classList.add('hide');
@@ -449,7 +449,11 @@ searchEl.addEventListener("keyup", function () {
     }
 })
 
+// Adding a click event for the history element, so that it will be hidden when clicked
+historyEl.addEventListener("click", function () {
 
+    historyEl.classList.add('hide');
+})
 
 window.initMap = initMap;
 
