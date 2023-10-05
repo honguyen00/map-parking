@@ -391,6 +391,7 @@ searchEl.addEventListener("keyup", function () {
 
 
 
+
 // let addressInput = searchValueEl.value.trim();
 // let searchIconEl = document.querySelector('.search-icon');
 
