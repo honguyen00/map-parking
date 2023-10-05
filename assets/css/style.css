@@ -113,6 +113,10 @@ i {
     font-size: 2rem;
 }
 
+strong {
+    font-weight: bold !important;
+}
+
 #map {
     height: 100%;
     width: 100%;
@@ -127,7 +131,6 @@ i {
     margin-top: 2rem;
     display: flex;
     flex-direction: column;
-    row-gap: 5px;
 }
 
 td {
@@ -144,6 +147,7 @@ tr:hover {
     height: 2rem;
     margin: 1rem;
     border-radius: 5px;
+    border: 1px solid black;
     font-size: medium;
     padding: 0 0.5rem;
     background-color: #fff;
@@ -158,13 +162,29 @@ tr:hover {
 .parkingIcon {
     max-height: 20px;
     margin-right: 5px;
-    margin-bottom: 5px;
 }
 
 .streetview {
-    width: 300px;
-    height: 300px;
+    width: 500px;
+    height: 200px;
     margin: 0 auto;
+}
+
+.feedback {
+    display: flex;
+    align-items: flex-end;
+    font-weight: bold;
+    column-gap: 5px;
+}
+
+.disLike:hover, .like:hover {
+    color: #2EBDD1;
+    transition: all .2s ease-in-out;
+    /* transform: scale(1.1); */
+}
+
+.active {
+    color: #2EBDD1;
 }
 
 .hide {

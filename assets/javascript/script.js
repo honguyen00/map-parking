@@ -41,7 +41,6 @@ async function initMap() {
     map.addListener('click', (event) => {
         if (event.placeId) {
             event.stop();
-            console.log(event)
         }
     });
     infoWindow1 = new google.maps.InfoWindow({
@@ -126,7 +125,7 @@ async function searchParkingAroundRadius(position) {
                     addResult(results[i], i);
                 }
                 map.setCenter(markers[0].position);
-                map.setZoom(14)
+                map.setZoom(15)
             }
         })
     }
@@ -175,7 +174,6 @@ function clearResults() {
 
 function showParkingInfo() {
     const marker = this;
-    console.log(marker);
     service.getDetails({ placeId: marker.placeResult.place_id }, (place, status) => {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
@@ -188,17 +186,23 @@ function showParkingInfo() {
 }
 
 function buildIWContent(place) {
-    var sv = new google.maps.StreetViewService();
     var infoDiv = $("#infowindow");
     if (infoDiv.children()) {
         infoDiv.empty();
     }
-    var headDiv = $("<div>")
+    var headDiv = $("<div class='mb-3'>")
     var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
     var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>");
     headDiv.append(placeIcon, placeName);
-    var placeAddress = $("<p>Address: " + place.vicinity + "</p>");
+    var placeAddress = $("<p class='mb-3'><strong>Address:</strong> " + place.vicinity + "</p>");
     infoDiv.append(headDiv[0], placeAddress[0]);
+    addPhotos(place, infoDiv, function() {
+        addRatingandFeedback(place,infoDiv);
+    });
+}
+
+function addPhotos(place, infoDiv, callback) {
+    var sv = new google.maps.StreetViewService();
     if (!place.photos) {
         var direction = new google.maps.DirectionsService();
         var request = {
@@ -209,7 +213,7 @@ function buildIWContent(place) {
         direction.route(request, (result, status) => {
             if (status == 'OK') {
                 var location = result.routes[0].legs[0].start_location;
-                var streetviewDiv = $("<div class='streetview'>");
+                var streetviewDiv = $("<div class='streetview mb-3'>");
                 sv.getPanoramaByLocation(location, 50, (data, status) => {
                     if (status == 'OK') {
                         var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
@@ -226,6 +230,7 @@ function buildIWContent(place) {
                         });
                         panorama.setVisible(true);
                         infoDiv.append(streetviewDiv);
+                        callback();
                     }
                 })
             }
@@ -233,8 +238,39 @@ function buildIWContent(place) {
     } else {
         var photoDiv;
     }
-
 }
+
+function addRatingandFeedback(place, infoDiv) {
+    var ratingHtml = "";
+    var ratingLab = "<strong>Rating: </strong> ";
+    if (place.rating) {
+        for (let i=0; i<5; i++) {
+            if (place.rating < i + 0.5) {
+                ratingHtml += "&#10025;";
+            }
+            else {
+                ratingHtml += "&#10029;";
+            }
+        } 
+        ratingHtml += " (" + place.rating + ")";
+    } else {
+        ratingHtml = "(No ratings)"
+    }
+    var ratingDiv = $("<div>" + ratingLab + ratingHtml + "</div>");
+    var accessFeedbackDiv = $("<div class='feedback'>")
+    var accessFeedbackLabel = $("<div>Does this place have disabled parking spaces and/or wheelchair accessible? </div>");
+    var up = $("<button class='like'><i class='fa fa-thumbs-up' aria-hidden='true'></i></button>");
+    var down = $("<button class='dislike'><i class='fa fa-thumbs-down' aria-hidden='true'></i></button>");
+    accessFeedbackDiv.append(accessFeedbackLabel, up, down)
+    infoDiv.append(ratingDiv, accessFeedbackDiv);
+}
+
+$('#infowindow').on("click",".like, .dislike", (event)=> {
+    event.preventDefault();
+    $('.active').removeClass('active');
+    $(event.target).addClass('active');
+    console.log($(event.target));
+})
 
 async function hightlightMarker(event) {
     if (event.target.tagName == 'TD') {
@@ -252,16 +288,18 @@ async function hightlightMarker(event) {
         scale: 1,
     })
     const onfocuspinBackground = new PinElement({
-        background: "#031cfc",
+        background: "#fc0317",
         borderColor: "black",
         glyphColor: "white",
         scale: 1.2,
     })
     if ($(markers[i].content).children().eq(0).children().eq(0).children().eq(0).attr("fill") == "white") {
         markers[i].content = onfocuspinBackground.element;
+        markers[i].zIndex = markers.length + 1;
     }
     else {
         markers[i].content = defaultpinBackground.element;
+        markers[i].zIndex = i;
     }
 }
 
