@@ -5,11 +5,6 @@ let markers = [];
 var resultTable = $("#results");
 var infoWindow1;
 
-// run after loading all html elements
-$(function () {
-    window.initMap = initMap;
-})
-
 // declare map, infoWindow, and service using google.api
 async function initMap() {
     // set initial location to be Australia
@@ -30,9 +25,9 @@ async function initMap() {
     // assign infoWindow, this is to show any extra information in a pop-up window in the map
     infoWindow = new google.maps.InfoWindow();
     // create a custom button to zoom in user's location 
-    const currentLocationButton = $("<button class='custom-map-control-button'>Jump to your current location</button>")
+    const currentLocationButton = $("<button class='custom-map-control-button'>Current location</button>")
     // add the cumstom button to the top center of the map
-    map.controls[google.maps.ControlPosition.TOP_CENTER].push(currentLocationButton[0]);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(currentLocationButton[0]);
     // add listener to the custom button, function getCurrentPos
     currentLocationButton.on("click", getCurrentPos);
     // declare service, this is to have access to PlacesService api to get methods such as search nearby, find place etc..
@@ -43,9 +38,6 @@ async function initMap() {
             event.stop();
         }
     });
-    infoWindow1 = new google.maps.InfoWindow({
-        content: document.getElementById("infowindow")
-    })
 }
 
 // function to get the current position of user from the browser
@@ -105,7 +97,7 @@ async function searchParkingAroundRadius(position) {
                 clearMarkers();
                 // console.log(results);
                 for (var i = 0; i < results.length; i++) {
-                    const markerLetter = String.fromCharCode("A".charCodeAt(0) + (i % 26));
+                    const markerNumber = String.fromCharCode("A".charCodeAt(0) + (i % 26));
                     const pinBackground = new PinElement({
                         background: "#031cfc",
                         borderColor: "white",
@@ -114,7 +106,7 @@ async function searchParkingAroundRadius(position) {
                     defaultpinBackground = pinBackground;
                     markers[i] = new AdvancedMarkerElement({
                         position: results[i].geometry.location,
-                        title: markerLetter + ". " + results[i].name,
+                        title: markerNumber + ". " + results[i].name,
                         content: pinBackground.element,
                     });
 
@@ -158,12 +150,12 @@ function clearMarkers() {
 }
 
 function addResult(result, i) {
-    const markerLetter = String.fromCharCode("A".charCodeAt(0) + (i % 26))
+    const markerNumber = i+1;
     const rowEle = $("<tr>");
     rowEle.on("click", () => {
         google.maps.event.trigger(markers[i], "click")
     })
-    var resultTd = $("<td class='result-item w-full'>" + markerLetter + ". " + result.name + "</td>");
+    var resultTd = $("<td class='result-item w-full'>" + markerNumber + ". " + result.name + "</td>");
     rowEle.append(resultTd);
     resultTable.append(rowEle);
 }
@@ -181,7 +173,6 @@ function showParkingInfo() {
         console.log(place)
         infoWindow1.open(map, marker);
         buildIWContent(place); 
-        map.setCenter(place.geometry.location) 
     });
 }
 
@@ -190,11 +181,11 @@ function buildIWContent(place) {
     if (infoDiv.children()) {
         infoDiv.empty();
     }
-    var headDiv = $("<div class='mb-3'>")
+    var headDiv = $("<div class='mb-2'>")
     var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
     var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>");
     headDiv.append(placeIcon, placeName);
-    var placeAddress = $("<p class='mb-3'><strong>Address:</strong> " + place.vicinity + "</p>");
+    var placeAddress = $("<p class='mb-2'><strong>Address:</strong> " + place.vicinity + "</p>");
     infoDiv.append(headDiv[0], placeAddress[0]);
     addPhotos(place, infoDiv, function() {
         addRatingandFeedback(place,infoDiv);
@@ -203,41 +194,37 @@ function buildIWContent(place) {
 
 function addPhotos(place, infoDiv, callback) {
     var sv = new google.maps.StreetViewService();
-    if (!place.photos) {
-        var direction = new google.maps.DirectionsService();
-        var request = {
-            origin: place.geometry.location,
-            destination: place.geometry.location,
-            travelMode: 'DRIVING'
-        };
-        direction.route(request, (result, status) => {
-            if (status == 'OK') {
-                var location = result.routes[0].legs[0].start_location;
-                var streetviewDiv = $("<div class='streetview mb-3'>");
-                sv.getPanoramaByLocation(location, 50, (data, status) => {
-                    if (status == 'OK') {
-                        var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
-                        const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
-                            addressControl: false,
-                            linksControl: false,
-                            enableCloseButton: false,
-                            panControl: false,          
-                        });
-                        panorama.setPano(data.location.pano);
-                        panorama.setPov({
-                            heading: heading,
-                            pitch: -20,
-                        });
-                        panorama.setVisible(true);
-                        infoDiv.append(streetviewDiv);
-                        callback();
-                    }
-                })
-            }
-        })
-    } else {
-        var photoDiv;
-    }
+    var direction = new google.maps.DirectionsService();
+    var request = {
+        origin: place.geometry.location,
+        destination: place.geometry.location,
+        travelMode: 'DRIVING'
+    };
+    direction.route(request, (result, status) => {
+        if (status == 'OK') {
+            var location = result.routes[0].legs[0].start_location;
+            var streetviewDiv = $("<div class='streetview mb-2'>");
+            sv.getPanoramaByLocation(location, 50, (data, status) => {
+                if (status == 'OK') {
+                    var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
+                    const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
+                        addressControl: false,
+                        linksControl: false,
+                        enableCloseButton: false,
+                        panControl: false,          
+                    });
+                    panorama.setPano(data.location.pano);
+                    panorama.setPov({
+                        heading: heading,
+                        pitch: -20,
+                    });
+                    panorama.setVisible(true);
+                    infoDiv.append(streetviewDiv);
+                    callback();
+                }
+            })
+        }
+    })
 }
 
 function addRatingandFeedback(place, infoDiv) {
@@ -358,3 +345,7 @@ saveEl.addEventListener("click", function () {
 
     searchOptionEl.classList.add('hide');
 });
+
+
+window.initMap = initMap;
+

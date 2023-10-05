@@ -62,8 +62,6 @@ side {
     border: 1px solid currentColor;
     border-radius: 8px;
     padding: 5px 60px 5px 5px;
-    align-items: center;
-    justify-content: space-between;
     position: relative;
 }
 
@@ -177,10 +175,9 @@ tr:hover {
     column-gap: 5px;
 }
 
-.disLike:hover, .like:hover {
+.dislike:hover, .like:hover {
     color: #2EBDD1;
     transition: all .2s ease-in-out;
-    /* transform: scale(1.1); */
 }
 
 .active {
