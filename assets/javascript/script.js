@@ -38,6 +38,11 @@ async function initMap() {
             event.stop();
         }
     });
+    var input = $("#search-address")[0];
+    const autocomplete = new google.maps.places.Autocomplete(input, options);
+    autocomplete.addListener("place_changed", ()=> {
+        console.log(autocomplete.getPlace());
+    })
 }
 
 // function to get the current position of user from the browser
