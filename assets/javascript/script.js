@@ -5,6 +5,11 @@ let markers = [];
 var resultTable = $("#results");
 var infoWindow1;
 
+// run after loading all html elements
+$(function () {
+    window.initMap = initMap;
+})
+
 // declare map, infoWindow, and service using google.api
 async function initMap() {
     // set initial location to be Australia
@@ -38,10 +43,18 @@ async function initMap() {
             event.stop();
         }
     });
+    infoWindow1 = new google.maps.InfoWindow({
+        content: document.getElementById("infowindow")
+    })
+    const options = {
+        fields: ["formatted_address", "geometry", "name"],
+        strictBounds: false,
+    };
     var input = $("#search-address")[0];
     const autocomplete = new google.maps.places.Autocomplete(input, options);
     autocomplete.addListener("place_changed", ()=> {
         console.log(autocomplete.getPlace());
+        createLocation(autocomplete.getPlace().geometry.location)
     })
 }
 
@@ -199,37 +212,41 @@ function buildIWContent(place) {
 
 function addPhotos(place, infoDiv, callback) {
     var sv = new google.maps.StreetViewService();
-    var direction = new google.maps.DirectionsService();
-    var request = {
-        origin: place.geometry.location,
-        destination: place.geometry.location,
-        travelMode: 'DRIVING'
-    };
-    direction.route(request, (result, status) => {
-        if (status == 'OK') {
-            var location = result.routes[0].legs[0].start_location;
-            var streetviewDiv = $("<div class='streetview mb-2'>");
-            sv.getPanoramaByLocation(location, 50, (data, status) => {
-                if (status == 'OK') {
-                    var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
-                    const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
-                        addressControl: false,
-                        linksControl: false,
-                        enableCloseButton: false,
-                        panControl: false,          
-                    });
-                    panorama.setPano(data.location.pano);
-                    panorama.setPov({
-                        heading: heading,
-                        pitch: -20,
-                    });
-                    panorama.setVisible(true);
-                    infoDiv.append(streetviewDiv);
-                    callback();
-                }
-            })
-        }
-    })
+    if (!place.photos) {
+        var direction = new google.maps.DirectionsService();
+        var request = {
+            origin: place.geometry.location,
+            destination: place.geometry.location,
+            travelMode: 'DRIVING'
+        };
+        direction.route(request, (result, status) => {
+            if (status == 'OK') {
+                var location = result.routes[0].legs[0].start_location;
+                var streetviewDiv = $("<div class='streetview mb-2'>");
+                sv.getPanoramaByLocation(location, 50, (data, status) => {
+                    if (status == 'OK') {
+                        var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
+                        const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
+                            addressControl: false,
+                            linksControl: false,
+                            enableCloseButton: false,
+                            panControl: false,          
+                        });
+                        panorama.setPano(data.location.pano);
+                        panorama.setPov({
+                            heading: heading,
+                            pitch: -20,
+                        });
+                        panorama.setVisible(true);
+                        infoDiv.append(streetviewDiv);
+                        callback();
+                    }
+                })
+            }
+        })
+    } else {
+        var photoDiv;
+    }
 }
 
 function addRatingandFeedback(place, infoDiv) {
@@ -350,7 +367,3 @@ saveEl.addEventListener("click", function () {
 
     searchOptionEl.classList.add('hide');
 });
-
-
-window.initMap = initMap;
-
