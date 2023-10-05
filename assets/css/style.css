@@ -150,10 +150,21 @@ tr:hover {
     color: black;
 }
 
+#infowindow {
+    display: flex;
+    flex-direction: column;
+}
+
 .parkingIcon {
     max-height: 20px;
     margin-right: 5px;
     margin-bottom: 5px;
+}
+
+.streetview {
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
 }
 
 .hide {

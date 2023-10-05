@@ -13,8 +13,6 @@ $(function () {
 // declare map, infoWindow, and service using google.api
 async function initMap() {
     // set initial location to be Australia
-    const { PinElement } = await google.maps.importLibrary("marker");
-    const { InfoWindow } = await google.maps.importLibrary("maps")
     const location = {
         au: {
             center: { lat: -25.3, lng: 133.8 },
@@ -100,8 +98,7 @@ async function searchParkingAroundRadius(position) {
         const search = {
             location: { lat: location["lat"], lng: location["lng"] },
             radius: 1000,
-            keyword: "car park",
-            type: 'parking',
+            keyword: "parking",
         };
         service.nearbySearch(search, (results, status, pagination) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && results) {
@@ -129,7 +126,7 @@ async function searchParkingAroundRadius(position) {
                     addResult(results[i], i);
                 }
                 map.setCenter(markers[0].position);
-                map.setZoom(16)
+                map.setZoom(14)
             }
         })
     }
@@ -178,28 +175,65 @@ function clearResults() {
 
 function showParkingInfo() {
     const marker = this;
+    console.log(marker);
     service.getDetails({ placeId: marker.placeResult.place_id }, (place, status) => {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
         }
         console.log(place)
         infoWindow1.open(map, marker);
-        buildIWContent(place);
-    })
-    google.maps.event.addListener(map, "click", function(event) {
-        infoWindow1.close();
+        buildIWContent(place); 
+        map.setCenter(place.geometry.location) 
     });
 }
 
 function buildIWContent(place) {
+    var sv = new google.maps.StreetViewService();
     var infoDiv = $("#infowindow");
     if (infoDiv.children()) {
         infoDiv.empty();
     }
+    var headDiv = $("<div>")
     var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
-    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>")
+    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>");
+    headDiv.append(placeIcon, placeName);
     var placeAddress = $("<p>Address: " + place.vicinity + "</p>");
-    infoDiv.append(placeIcon[0], placeName[0], placeAddress[0]);
+    infoDiv.append(headDiv[0], placeAddress[0]);
+    if (!place.photos) {
+        var direction = new google.maps.DirectionsService();
+        var request = {
+            origin: place.geometry.location,
+            destination: place.geometry.location,
+            travelMode: 'DRIVING'
+        };
+        direction.route(request, (result, status) => {
+            if (status == 'OK') {
+                var location = result.routes[0].legs[0].start_location;
+                var streetviewDiv = $("<div class='streetview'>");
+                sv.getPanoramaByLocation(location, 50, (data, status) => {
+                    if (status == 'OK') {
+                        var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
+                        const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
+                            addressControl: false,
+                            linksControl: false,
+                            enableCloseButton: false,
+                            panControl: false,          
+                        });
+                        panorama.setPano(data.location.pano);
+                        panorama.setPov({
+                            heading: heading,
+                            pitch: -20,
+                        });
+                        panorama.setVisible(true);
+                        infoDiv.append(streetviewDiv);
+                    }
+                })
+            }
+        })
+    } else {
+        var photoDiv;
+    }
+
 }
 
 async function hightlightMarker(event) {
