@@ -10,6 +10,7 @@
     --river-bed: #48555B;
     --orange: #F38950;
     --whiskey: #E88553;
+    --neon-blue: #2EBDD1;
 }
 
 /* ================================================================ */
@@ -135,24 +136,24 @@ section {
     cursor: pointer;
 }
 
-#results {
-    margin-top: 2rem;
-    /* display: flex;
-    flex-direction: column; */
-}
-
-td {
-    overflow: hidden;
-    white-space: normal;
-}
-
 tr:hover {
     font-style: italic;
     text-decoration: underline;
 }
 
+#more {
+    background-color: var(--river-bed);
+    color: white;
+    height: 3rem;
+    font-size: 1.5rem;
+}
+
+#more[disabled='disabled'] {
+    background-color: var(--gray);
+}
+
 .custom-map-control-button {
-    height: 2rem;
+    height: 3.5rem;
     margin: 1rem;
     border-radius: 5px;
     border: 1px solid black;
@@ -186,12 +187,12 @@ tr:hover {
 }
 
 .dislike:hover, .like:hover {
-    color: #2EBDD1;
+    color: var(--neon-blue);
     transition: all .2s ease-in-out;
 }
 
 .active {
-    color: #2EBDD1;
+    color: var(--neon-blue);
 }
 
 .hide {

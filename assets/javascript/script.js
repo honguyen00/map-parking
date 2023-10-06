@@ -4,6 +4,7 @@ let infoWindow;
 let markers = [];
 var resultTable = $("#results");
 var infoWindow1;
+var searchMarker;
 
 // run after loading all html elements
 $(function () {
@@ -49,11 +50,17 @@ async function initMap() {
     const options = {
         fields: ["formatted_address", "geometry", "name"],
         strictBounds: false,
+        componentRestrictions: {country: "au"}
     };
     var input = $("#search-address")[0];
     const autocomplete = new google.maps.places.Autocomplete(input, options);
-    autocomplete.addListener("place_changed", ()=> {
-        createLocation(autocomplete.getPlace().geometry.location)
+    // autocomplete.addListener("place_changed", ()=> {
+    //     createLocation(autocomplete.getPlace().geometry.location)
+    // });
+    searchMarker = new google.maps.Marker();
+    $(".search-icon").on("click", (event) => {
+        event.preventDefault();
+        createLocation(autocomplete.getPlace().geometry.location);
     })
 }
 
@@ -87,15 +94,16 @@ function getCurrentPos() {
 function createLocation(place) {
     if (!place) return;
     clearResults();
-    clearMarkers();
+    clearSearchMarker();
+    clearResultMarkers();
     map.setCenter(place);
     map.setZoom(12)
-    const marker = new google.maps.Marker({
+    searchMarker = new google.maps.Marker({
         map: map,
         position: place,
         animation: google.maps.Animation.DROP,
     });
-    marker.addListener("dblclick", searchParkingAroundRadius, { passive: true })
+    searchMarker.addListener("dblclick", searchParkingAroundRadius, { passive: true })
 }
 
 async function searchParkingAroundRadius(position) {
@@ -148,8 +156,11 @@ function dropMarker(i) {
         markers[i].setMap(map);
     }
 }
+function clearSearchMarker() {
+    searchMarker.setMap(null);
+}
 
-function clearMarkers() {
+function clearResultMarkers() {
     for (let i = 0; i < markers.length; i++) {
         if (markers[i]) {
             markers[i].setMap(null);

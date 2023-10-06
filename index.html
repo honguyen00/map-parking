@@ -120,16 +120,16 @@
                     </div>
                 </div>
             </form>
-            <section class="overflow-y-scroll mt-5">
-                <div class="history" id="history" style="display: none;">View Previous Searches</div>
+            <div class="history" id="history" style="display: none;">View Previous Searches</div>
+            <div class="flex flex-col mt-5 overflow-y-auto">
+                <h2 class="text-2xl mx-auto font-bold">Results:</h2>
                 <div class="search-result w-100 flex flex-col">
-                    <h2 class="text-xl font-bold">Results:</h2>
-                    <table class="min-w-full" id="result-table">
+                    <table class="min-w-full overflow-y-scroll" id="result-table">
                         <tbody id="results"></tbody>
                     </table>
-                    <button class='rounded-lg border-2 border-solid border-gray-100 p-1 mx-auto grow' id="more">Load more results</button>
                 </div>
-            </section>
+                <button class='rounded-lg border-2 border-solid border-gray-100 p-1 mx-auto mt-2' id="more">Load more results</button>
+            </div>
         </side>
         <article class="map-container w-full h-full md:w-2/3 lg:w-3/4 xl:w-4/5" id="map-container">
             <div id="map"></div>
