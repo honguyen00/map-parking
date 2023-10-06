@@ -52,15 +52,23 @@ async function initMap() {
         strictBounds: false,
         componentRestrictions: {country: "au"}
     };
-    var input = $("#search-address")[0];
-    const autocomplete = new google.maps.places.Autocomplete(input, options);
+    var input = $("#search-address");
+    const autocomplete = new google.maps.places.Autocomplete(input[0], options);
     // autocomplete.addListener("place_changed", ()=> {
     //     createLocation(autocomplete.getPlace().geometry.location)
     // });
     searchMarker = new google.maps.Marker();
     $(".search-icon").on("click", (event) => {
         event.preventDefault();
-        createLocation(autocomplete.getPlace().geometry.location);
+        if(input.val() != "") {
+            if (typeof autocomplete.getPlace() != typeof undefined) {
+                createLocation(autocomplete.getPlace().geometry.location);
+                input.val("");
+            }
+            else {
+                handleLocationError(true, infoWindow, map.getCenter());
+            }
+        }
     })
 }
 
@@ -119,7 +127,6 @@ async function searchParkingAroundRadius(position) {
             moreButton.attr("disabled", true)
             if (getNextPage) {
                 getNextPage();
-                console.log("need to get next page")
             }
         }) 
         var i = 0;
@@ -192,7 +199,6 @@ async function addResultsToMap(results, i) {
         addResultsToDiv(result, i);
         i++;
     });
-    console.log(markers);
 }
 
 function addResultsToDiv(result, i) {

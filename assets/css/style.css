@@ -11,6 +11,7 @@
     --orange: #F38950;
     --whiskey: #E88553;
     --neon-blue: #2EBDD1;
+    --shuttle-gray: #566679;
 }
 
 /* ================================================================ */
@@ -34,8 +35,8 @@ header {
 }
 
 main {
-    height: 86vh;
     background-color: var(--gray);
+    overflow: auto;
 }
 
 a {
@@ -59,6 +60,9 @@ side {
     display: flex;
     flex-direction: column;
     padding: 1rem 1.5rem 1rem 1.5rem;
+}
+#map-container {
+    height: 100%;
 }
 
 #search-bar {
@@ -122,6 +126,7 @@ strong {
     height: 100%;
     width: 100%;
     z-index: 1;
+    overflow: hidden;
 }
 
 section {
@@ -141,6 +146,17 @@ tr:hover {
     text-decoration: underline;
 }
 
+tr:nth-child(odd) {
+    background-color: var(--wheat-field);
+    border-bottom: 1px solid black;
+}
+
+tr:nth-child(even) {
+    background-color: var(--shuttle-gray);
+    border-bottom: 1px solid black;
+    color: white;
+}
+
 #more {
     background-color: var(--river-bed);
     color: white;
@@ -150,6 +166,7 @@ tr:hover {
 
 #more[disabled='disabled'] {
     background-color: var(--gray);
+    color: var(--shuttle-gray);
 }
 
 .custom-map-control-button {
