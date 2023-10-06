@@ -222,12 +222,12 @@ tr:hover {
     font-size: 15px;
 }
 
-.history button {
+.history a {
     font-size: 15px;
     padding-left: 10px;
     margin: 5px;
 }
 
-.history button:hover {
+.history a:hover {
 color: var(--blue);
 }
