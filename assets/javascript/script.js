@@ -53,7 +53,6 @@ async function initMap() {
     var input = $("#search-address")[0];
     const autocomplete = new google.maps.places.Autocomplete(input, options);
     autocomplete.addListener("place_changed", ()=> {
-        console.log(autocomplete.getPlace());
         createLocation(autocomplete.getPlace().geometry.location)
     })
 }
@@ -75,7 +74,7 @@ function getCurrentPos() {
             },
             // if user block, no positon, give error
             () => {
-                handleLocationError(true, infoWindow, map.getCenter())
+                handleLocationError(true, infoWindow, map.getCenter());
             }
         );
     }
@@ -87,6 +86,8 @@ function getCurrentPos() {
 
 function createLocation(place) {
     if (!place) return;
+    clearResults();
+    clearMarkers();
     map.setCenter(place);
     map.setZoom(12)
     const marker = new google.maps.Marker({
@@ -98,54 +99,44 @@ function createLocation(place) {
 }
 
 async function searchParkingAroundRadius(position) {
-    if (typeof position == String) {
-        // console.log("Is a string");
-    }
-    else {
-        const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
         var location = position.latLng.toJSON();
         const search = {
             location: { lat: location["lat"], lng: location["lng"] },
             radius: 1000,
-            keyword: "parking",
+            keyword: "parking lot",
         };
-        service.nearbySearch(search, (results, status, pagination) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                clearResults();
-                clearMarkers();
-                // console.log(results);
-                for (var i = 0; i < results.length; i++) {
-                    const markerNumber = String.fromCharCode("A".charCodeAt(0) + (i % 26));
-                    const pinBackground = new PinElement({
-                        background: "#031cfc",
-                        borderColor: "white",
-                        glyphColor: "black",
-                    })
-                    defaultpinBackground = pinBackground;
-                    markers[i] = new AdvancedMarkerElement({
-                        position: results[i].geometry.location,
-                        title: markerNumber + ". " + results[i].name,
-                        content: pinBackground.element,
-                    });
-
-                    markers[i].placeResult = results[i];
-                    // markers[i].addListener("click", showParkingInfo);
-                    google.maps.event.addListener(markers[i], "click", showParkingInfo)
-                    setTimeout(dropMarker(i), i*100);
-                    addResult(results[i], i);
-                }
-                map.setCenter(markers[0].position);
-                map.setZoom(15)
+        var moreButton = $("#more");
+        let getNextPage;
+        moreButton.on("click", function() {
+            moreButton.attr("disabled", true)
+            if (getNextPage) {
+                getNextPage();
+                console.log("need to get next page")
             }
+        }) 
+        var i = 0;
+        service.nearbySearch(search, (results, status, pagination) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && results) { 
+            addResultsToMap(results, i);
+            moreButton.attr("disabled", (!pagination || !pagination.hasNextPage));
+            if (pagination && pagination.hasNextPage) {
+                getNextPage = () => {
+                    pagination.nextPage();
+                    i += 20;
+                }
+            } 
+        }
+        else {
+            handleLocationError(true, infoWindow, map.getCenter());
+        }
         })
     }
-}
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
     infoWindow.setContent(
         browserHasGeolocation
-            ? "Error: The Geolocation service failed."
+            ? "Error: There is no results available"
             : "Error: Your browser doesn't support geolocation.",
     );
     infoWindow.open(map);
@@ -167,16 +158,43 @@ function clearMarkers() {
     markers = [];
 }
 
-function addResult(result, i) {
-    const markerNumber = i+1;
-    const rowEle = $("<tr>");
-    rowEle.on("click", () => {
-        google.maps.event.trigger(markers[i], "click")
-    })
-    var resultTd = $("<td class='result-item w-full'>" + markerNumber + ". " + result.name + "</td>");
-    rowEle.append(resultTd);
-    resultTable.append(rowEle);
+async function addResultsToMap(results, i) {
+    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+    results.forEach(result => {
+        var markerNumber = i+1;
+        const pinBackground = new PinElement({
+            background: "#031cfc",
+            borderColor: "white",
+            glyphColor: "black",
+        })
+        defaultpinBackground = pinBackground;
+        markers.push(new AdvancedMarkerElement({
+            position: result.geometry.location,
+            title: markerNumber + ". " + result.name,
+            content: pinBackground.element,
+        }));
+
+        markers[i].placeResult = result;
+        google.maps.event.addListener(markers[i], "click", showParkingInfo)
+        setTimeout(dropMarker(i), i*100);
+        // addResultsToMap(results[i], i);
+        addResultsToDiv(result, i);
+        i++;
+    });
+    console.log(markers);
 }
+
+function addResultsToDiv(result, i) {
+        var markerNumber = i+1;
+        const rowEle = $("<tr>");
+        rowEle.on("click", () => {
+            google.maps.event.trigger(markers[i], "click");
+        })
+        var resultTd = $("<td class='result-item w-full'>" + markerNumber + ". " + result.name + "</td>");
+        rowEle.append(resultTd);
+        resultTable.append(rowEle);
+}
+
 
 function clearResults() {
     resultTable.empty();
@@ -188,7 +206,6 @@ function showParkingInfo() {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
         }
-        console.log(place)
         infoWindow1.open(map, marker);
         buildIWContent(place); 
     });
@@ -212,41 +229,37 @@ function buildIWContent(place) {
 
 function addPhotos(place, infoDiv, callback) {
     var sv = new google.maps.StreetViewService();
-    if (!place.photos) {
-        var direction = new google.maps.DirectionsService();
-        var request = {
-            origin: place.geometry.location,
-            destination: place.geometry.location,
-            travelMode: 'DRIVING'
-        };
-        direction.route(request, (result, status) => {
-            if (status == 'OK') {
-                var location = result.routes[0].legs[0].start_location;
-                var streetviewDiv = $("<div class='streetview mb-2'>");
-                sv.getPanoramaByLocation(location, 50, (data, status) => {
-                    if (status == 'OK') {
-                        var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
-                        const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
-                            addressControl: false,
-                            linksControl: false,
-                            enableCloseButton: false,
-                            panControl: false,          
-                        });
-                        panorama.setPano(data.location.pano);
-                        panorama.setPov({
-                            heading: heading,
-                            pitch: -20,
-                        });
-                        panorama.setVisible(true);
-                        infoDiv.append(streetviewDiv);
-                        callback();
-                    }
-                })
-            }
-        })
-    } else {
-        var photoDiv;
-    }
+    var direction = new google.maps.DirectionsService();
+    var request = {
+        origin: place.geometry.location,
+        destination: place.geometry.location,
+        travelMode: 'DRIVING'
+    };
+    direction.route(request, (result, status) => {
+        if (status == 'OK') {
+            var location = result.routes[0].legs[0].start_location;
+            var streetviewDiv = $("<div class='streetview mb-2'>");
+            sv.getPanoramaByLocation(location, 50, (data, status) => {
+                if (status == 'OK') {
+                    var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
+                    const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
+                        addressControl: false,
+                        linksControl: false,
+                        enableCloseButton: false,
+                        panControl: false,          
+                    });
+                    panorama.setPano(data.location.pano);
+                    panorama.setPov({
+                        heading: heading,
+                        pitch: 5,
+                    });
+                    panorama.setVisible(true);
+                    infoDiv.append(streetviewDiv);
+                    callback();
+                }
+            })
+        }
+    })
 }
 
 function addRatingandFeedback(place, infoDiv) {
@@ -278,7 +291,6 @@ $('#infowindow').on("click",".like, .dislike", (event)=> {
     event.preventDefault();
     $('.active').removeClass('active');
     $(event.target).addClass('active');
-    console.log($(event.target));
 })
 
 async function hightlightMarker(event) {

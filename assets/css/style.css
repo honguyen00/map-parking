@@ -55,6 +55,8 @@ h1:hover {
 }
 
 side {
+    display: flex;
+    flex-direction: column;
     padding: 1rem 1.5rem 1rem 1.5rem;
 }
 
@@ -121,14 +123,22 @@ strong {
     z-index: 1;
 }
 
+section {
+    max-height: 100%;
+}
+
+.search-results {
+    overflow-y: scroll;
+}
+
 #results:hover {
     cursor: pointer;
 }
 
 #results {
     margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
+    /* display: flex;
+    flex-direction: column; */
 }
 
 td {
