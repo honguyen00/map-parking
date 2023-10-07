@@ -10,6 +10,14 @@
     --river-bed: #48555B;
     --orange: #F38950;
     --whiskey: #E88553;
+    --neon-blue: #2EBDD1;
+    --shuttle-gray: #566679;
+    --white: white;
+    --darkgray: darkgray;
+    --black: black;
+    --charcoal: #444746;
+    --blue: #1183d6;
+    --gray-text: #bbb;
 }
 
 /* ================================================================ */
@@ -24,7 +32,7 @@ body {
     height: 100%;
     background-color: var(--gray-blue);
     margin: 0;
-    color: black;
+    color: var(--black);
 }
 
 header {
@@ -33,8 +41,8 @@ header {
 }
 
 main {
-    height: 86vh;
     background-color: var(--gray);
+    overflow: auto;
 }
 
 a {
@@ -46,7 +54,7 @@ td {
 }
 
 header a:hover {
-    color: white;
+    color: var(--white);
     text-decoration: underline;
 }
 
@@ -55,39 +63,44 @@ h1:hover {
 }
 
 side {
+    display: flex;
+    flex-direction: column;
     padding: 1rem 1.5rem 1rem 1.5rem;
+}
+#map-container {
+    height: 100%;
 }
 
 #search-bar {
     border: 1px solid currentColor;
-    border-radius: 8px;
-    padding: 5px 26px 5px 26px;
-    align-items: center;
-    justify-content: space-between;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    padding: 5px 60px 5px 5px;
+    box-shadow: 1px 1px 0 1px var(--darkgray);
     position: relative;
 }
 
-#search-bar #filter {
-    color: #444746;
+#search-bar #filter-Btn {
+    color: var(--charcoal);
     overflow: hidden;
     min-width: 24px;
     min-height: 24px;
     position: absolute;
     top: 0.5rem;
-    right: 0;
+    right: 30px;
     border-radius: 50%;
 }
 
-#search-bar #filter:focus {
-    box-shadow: 0 0 3px 0 #1183d6;
-    border-color: #1183d6;
+#search-bar #filter-Btn:focus {
+    box-shadow: 0 0 3px 0 var(--blue);
+    border-color: var(--black);
     outline: none;
 }
 
-#search-bar i {
+#search-bar .search-icon {
     position: absolute;
-    top: 0.6rem;
-    left: 0;
+    top: 0.7rem;
+    right: 4px;
 }
 
 input[type="text"] {
@@ -100,40 +113,40 @@ input[type="text"] {
 }
 
 input[type="text"]:focus {
-    box-shadow: 0 0 3px 0 #1183d6;
-    border-color: #1183d6;
+    box-shadow: 0 0 3px 0 var(--blue);
+    border-color: var(--blue);
     outline: none;
 }
 
 input[type="text"]::placeholder {
-    color: #bbb;
+    color: var(--gray-text);
 }
 
 i {
     font-size: 2rem;
 }
 
+strong {
+    font-weight: bold !important;
+}
 
 #map {
     height: 100%;
     width: 100%;
     z-index: 1;
+    overflow: hidden;
+}
+
+section {
+    max-height: 100%;
+}
+
+.search-results {
+    overflow-y: scroll;
 }
 
 #results:hover {
     cursor: pointer;
-}
-
-#results {
-    margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
-    row-gap: 5px;
-}
-
-td {
-    overflow: hidden;
-    white-space: normal;
 }
 
 tr:hover {
@@ -141,22 +154,107 @@ tr:hover {
     text-decoration: underline;
 }
 
+tr:nth-child(odd) {
+    background-color: var(--wheat-field);
+    border-bottom: 1px solid black;
+}
+
+tr:nth-child(even) {
+    background-color: var(--shuttle-gray);
+    border-bottom: 1px solid black;
+    color: white;
+}
+
+#more {
+    background-color: var(--river-bed);
+    color: white;
+    height: 3rem;
+    font-size: 1.5rem;
+}
+
+#more[disabled='disabled'] {
+    background-color: var(--gray);
+    color: var(--shuttle-gray);
+}
+
 .custom-map-control-button {
-    height: 2rem;
+    height: 3.5rem;
     margin: 1rem;
     border-radius: 5px;
+    border: 1px solid black;
     font-size: medium;
     padding: 0 0.5rem;
-    background-color: #fff;
-    color: black;
+    background-color: var(--white);
+    color: var(--black);
+}
+
+#infowindow {
+    display: flex;
+    flex-direction: column;
 }
 
 .parkingIcon {
     max-height: 20px;
     margin-right: 5px;
-    margin-bottom: 5px;
+}
+
+.streetview {
+    width: 100%;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.feedback {
+    display: flex;
+    align-items: flex-end;
+    font-weight: bold;
+    column-gap: 5px;
+}
+
+.active {
+    color: var(--neon-blue);
 }
 
 .hide {
     display: none;
+}
+
+.history {
+    height: fit-content;
+    background-color: var(--gray);
+    width: 100%;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    box-shadow: 1px 1px 0 2px var(--darkgray);
+    overflow: hidden;
+    position: absolute;
+    top: 34px;
+    left: 0px;
+    z-index: 5;
+}
+
+.history h2 {
+    font-size: 15px;
+    padding: 5px 5px 5px 10px;
+    font-weight: bold;
+}
+
+.historyItem {
+    display: flex;
+    align-items: center;
+}
+
+.history i {
+    padding-left: 10px;
+    font-size: 15px;
+}
+
+.history a {
+    font-size: 15px;
+    padding-left: 10px;
+    margin: 5px;
+}
+
+.history a:hover {
+color: var(--blue);
 }

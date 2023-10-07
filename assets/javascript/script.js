@@ -3,7 +3,10 @@ let service;
 let infoWindow;
 let markers = [];
 var resultTable = $("#results");
-var infoWindow1;
+var parkingIW;
+var searchMarker;
+var radius;
+var currentFocusedMarker;
 
 // run after loading all html elements
 $(function () {
@@ -43,19 +46,32 @@ async function initMap() {
             event.stop();
         }
     });
-    infoWindow1 = new google.maps.InfoWindow({
+    parkingIW = new google.maps.InfoWindow({
         content: document.getElementById("infowindow")
     })
     const options = {
         fields: ["formatted_address", "geometry", "name"],
         strictBounds: false,
+        componentRestrictions: {country: "au"}
     };
-    var input = $("#search-address")[0];
-    const autocomplete = new google.maps.places.Autocomplete(input);
-    autocomplete.addListener("place_changed", ()=> {
-        console.log(autocomplete.getPlace());
-        createLocation(autocomplete.getPlace().geometry.location)
+    var input = $("#search-address");
+    const autocomplete = new google.maps.places.Autocomplete(input[0], options);
+    searchMarker = new google.maps.Marker();
+    $(".search-icon").on("click", (event) => {
+        event.preventDefault();
+        if(input.val() != "") {
+            if (typeof autocomplete.getPlace() != typeof undefined) {
+                createLocation(autocomplete.getPlace().geometry.location);
+                saveHitory(autocomplete.getPlace().geometry.location);
+                input.val("");
+            }
+            else {
+                handleLocationError(true, infoWindow, map.getCenter());
+            }
+        }
     })
+    radius = 1000;
+    showHistory();
 }
 
 // function to get the current position of user from the browser
@@ -75,7 +91,7 @@ function getCurrentPos() {
             },
             // if user block, no positon, give error
             () => {
-                handleLocationError(true, infoWindow, map.getCenter())
+                handleLocationError(true, infoWindow, map.getCenter());
             }
         );
     }
@@ -87,65 +103,58 @@ function getCurrentPos() {
 
 function createLocation(place) {
     if (!place) return;
-    map.setCenter(place);
+    clearResults();
+    clearSearchMarker();
+    clearResultMarkers();
+    map.panTo(place);
     map.setZoom(12)
-    const marker = new google.maps.Marker({
+    searchMarker = new google.maps.Marker({
         map: map,
         position: place,
         animation: google.maps.Animation.DROP,
     });
-    marker.addListener("dblclick", searchParkingAroundRadius, { passive: true })
+    searchMarker.addListener("dblclick", searchParkingAroundRadius, { passive: true })
 }
 
 async function searchParkingAroundRadius(position) {
-    if (typeof position == String) {
-        // console.log("Is a string");
-    }
-    else {
-        const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
         var location = position.latLng.toJSON();
         const search = {
             location: { lat: location["lat"], lng: location["lng"] },
-            radius: 1000,
-            keyword: "parking",
+            radius: radius,
+            keyword: "parking lot",
         };
-        service.nearbySearch(search, (results, status, pagination) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                clearResults();
-                clearMarkers();
-                // console.log(results);
-                for (var i = 0; i < results.length; i++) {
-                    const markerNumber = String.fromCharCode("A".charCodeAt(0) + (i % 26));
-                    const pinBackground = new PinElement({
-                        background: "#031cfc",
-                        borderColor: "white",
-                        glyphColor: "black",
-                    })
-                    defaultpinBackground = pinBackground;
-                    markers[i] = new AdvancedMarkerElement({
-                        position: results[i].geometry.location,
-                        title: markerNumber + ". " + results[i].name,
-                        content: pinBackground.element,
-                    });
-
-                    markers[i].placeResult = results[i];
-                    // markers[i].addListener("click", showParkingInfo);
-                    google.maps.event.addListener(markers[i], "click", showParkingInfo)
-                    setTimeout(dropMarker(i), i * 100);
-                    addResult(results[i], i);
-                }
-                map.setCenter(markers[0].position);
-                map.setZoom(15)
+        var moreButton = $("#more");
+        let getNextPage;
+        moreButton.on("click", function() {
+            moreButton.attr("disabled", true)
+            if (getNextPage) {
+                getNextPage();
             }
+        }) 
+        var i = 0;
+        service.nearbySearch(search, (results, status, pagination) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && results) { 
+            addResultsToMap(results, i);
+            moreButton.attr("disabled", (!pagination || !pagination.hasNextPage));
+            if (pagination && pagination.hasNextPage) {
+                getNextPage = () => {
+                    pagination.nextPage();
+                    i += 20;
+                }
+            } 
+        }
+        else {
+            handleLocationError(true, infoWindow, map.getCenter());
+        }
         })
+        map.setZoom(14);
     }
-}
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
     infoWindow.setContent(
         browserHasGeolocation
-            ? "Error: The Geolocation service failed."
+            ? "Error: There is no results available"
             : "Error: Your browser doesn't support geolocation.",
     );
     infoWindow.open(map);
@@ -157,8 +166,11 @@ function dropMarker(i) {
         markers[i].setMap(map);
     }
 }
+function clearSearchMarker() {
+    searchMarker.setMap(null);
+}
 
-function clearMarkers() {
+function clearResultMarkers() {
     for (let i = 0; i < markers.length; i++) {
         if (markers[i]) {
             markers[i].setMap(null);
@@ -167,29 +179,56 @@ function clearMarkers() {
     markers = [];
 }
 
-function addResult(result, i) {
-    const markerNumber = i+1;
-    const rowEle = $("<tr>");
-    rowEle.on("click", () => {
-        google.maps.event.trigger(markers[i], "click")
-    })
-    var resultTd = $("<td class='result-item w-full'>" + markerNumber + ". " + result.name + "</td>");
-    rowEle.append(resultTd);
-    resultTable.append(rowEle);
+async function addResultsToMap(results, i) {
+    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+    results.forEach(result => {
+        var markerNumber = i+1;
+        const pinBackground = new PinElement({
+            background: "#031cfc",
+            borderColor: "white",
+            glyphColor: "black",
+        })
+        defaultpinBackground = pinBackground;
+        markers.push(new AdvancedMarkerElement({
+            position: result.geometry.location,
+            title: markerNumber + ". " + result.name,
+            content: pinBackground.element,
+        }));
+
+        markers[i].placeResult = result;
+        google.maps.event.addListener(markers[i], "click", showParkingInfo)
+        setTimeout(dropMarker(i), i*100);
+        addResultsToDiv(result, i);
+        i++;
+    });
 }
+
+function addResultsToDiv(result, i) {
+        var markerNumber = i+1;
+        const rowEle = $("<tr>");
+        rowEle.on("click", () => {
+            google.maps.event.trigger(markers[i], "click");
+        })
+        var resultTd = $("<td class='result-item w-full'>" + markerNumber + ". " + result.name + "</td>");
+        rowEle.append(resultTd);
+        resultTable.append(rowEle);
+}
+
 
 function clearResults() {
     resultTable.empty();
 }
 
 function showParkingInfo() {
+    currentFocusedMarker = this;
     const marker = this;
     service.getDetails({ placeId: marker.placeResult.place_id }, (place, status) => {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
         }
-        console.log(place)
-        infoWindow1.open(map, marker);
+        parkingIW.open(map, marker);
+        map.panTo(marker.placeResult.geometry.location);
+        map.setZoom(16 - (radius/1000));
         buildIWContent(place); 
     });
 }
@@ -212,41 +251,37 @@ function buildIWContent(place) {
 
 function addPhotos(place, infoDiv, callback) {
     var sv = new google.maps.StreetViewService();
-    if (!place.photos) {
-        var direction = new google.maps.DirectionsService();
-        var request = {
-            origin: place.geometry.location,
-            destination: place.geometry.location,
-            travelMode: 'DRIVING'
-        };
-        direction.route(request, (result, status) => {
-            if (status == 'OK') {
-                var location = result.routes[0].legs[0].start_location;
-                var streetviewDiv = $("<div class='streetview mb-2'>");
-                sv.getPanoramaByLocation(location, 50, (data, status) => {
-                    if (status == 'OK') {
-                        var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
-                        const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
-                            addressControl: false,
-                            linksControl: false,
-                            enableCloseButton: false,
-                            panControl: false,          
-                        });
-                        panorama.setPano(data.location.pano);
-                        panorama.setPov({
-                            heading: heading,
-                            pitch: -20,
-                        });
-                        panorama.setVisible(true);
-                        infoDiv.append(streetviewDiv);
-                        callback();
-                    }
-                })
-            }
-        })
-    } else {
-        var photoDiv;
-    }
+    var direction = new google.maps.DirectionsService();
+    var request = {
+        origin: place.geometry.location,
+        destination: place.geometry.location,
+        travelMode: 'DRIVING'
+    };
+    direction.route(request, (result, status) => {
+        if (status == 'OK') {
+            var location = result.routes[0].legs[0].start_location;
+            var streetviewDiv = $("<div class='streetview mb-2'>");
+            sv.getPanoramaByLocation(location, 50, (data, status) => {
+                if (status == 'OK') {
+                    var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
+                    const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
+                        addressControl: false,
+                        linksControl: false,
+                        enableCloseButton: false,
+                        panControl: false,          
+                    });
+                    panorama.setPano(data.location.pano);
+                    panorama.setPov({
+                        heading: heading,
+                        pitch: 5,
+                    });
+                    panorama.setVisible(true);
+                    infoDiv.append(streetviewDiv);
+                    callback();
+                }
+            })
+        }
+    })
 }
 
 function addRatingandFeedback(place, infoDiv) {
@@ -267,18 +302,65 @@ function addRatingandFeedback(place, infoDiv) {
     }
     var ratingDiv = $("<div>" + ratingLab + ratingHtml + "</div>");
     var accessFeedbackDiv = $("<div class='feedback'>")
-    var accessFeedbackLabel = $("<div>Does this place have disabled parking spaces and/or wheelchair accessible? </div>");
-    var up = $("<button class='like'><i class='fa fa-thumbs-up' aria-hidden='true'></i></button>");
-    var down = $("<button class='dislike'><i class='fa fa-thumbs-down' aria-hidden='true'></i></button>");
-    accessFeedbackDiv.append(accessFeedbackLabel, up, down)
+    var accessFeedbackLabel = $("<p>Does this place have disabled parking spaces and/or wheelchair accessible? </p>");
+    var upcount = 0;
+    var downcount = 0;
+    var feedback = JSON.parse(localStorage.getItem("feedback"));
+    var savedLocation = {lat: $(currentFocusedMarker)[0].ln.lat, lng: $(currentFocusedMarker)[0].ln.lng};
+    if (feedback) {
+        feedback.find((item) => {
+            if (JSON.stringify(item.location) === JSON.stringify(savedLocation)) {
+                upcount = item.up;
+                downcount = item.down;
+                return;
+            }
+        })
+    }
+    var up = $("<button class='like my-auto'><i class='fa fa-thumbs-up' aria-hidden='true'></i></button>");
+    var upCountDiv = $("<div class='my-auto'>(<span id='upcount'>" + upcount + "</span>)</div>");
+    var down = $("<button class='dislike my-auto'><i class='fa fa-thumbs-down' aria-hidden='true'></i></button>");
+    var downCountDiv = $("<div class='my-auto'>(<span id='downcount'>" + downcount + "</span>)</div>");
+    accessFeedbackDiv.append(accessFeedbackLabel, up, upCountDiv, down, downCountDiv)
     infoDiv.append(ratingDiv, accessFeedbackDiv);
 }
 
 $('#infowindow').on("click",".like, .dislike", (event)=> {
     event.preventDefault();
-    $('.active').removeClass('active');
+    // $('.active').removeClass('active');
+    // $(event.target).addClass('active');
+    var savedLocation = {lat: $(currentFocusedMarker)[0].ln.lat, lng: $(currentFocusedMarker)[0].ln.lng};
+    var upcountEle = $("#upcount");
+    var downcountEle = $("#downcount");
+    var upcount = parseInt(upcountEle[0].textContent);
+    var downcount = parseInt(downcountEle[0].textContent);
+    if ($(event.target).attr("class") === 'fa fa-thumbs-up') {
+        upcount++;
+        upcountEle[0].textContent = upcount;
+    } else {
+        downcount++;
+        downcountEle[0].textContent = downcount;
+    }
+    // ===================================================================================================
+    var localStorageItem = {location: savedLocation, up: upcount, down: downcount};
+    var feedback = JSON.parse(localStorage.getItem("feedback")) || [];
+    if (feedback.find((item) => {if (JSON.stringify(item.location) === JSON.stringify(savedLocation)) {
+                    item.up = upcount;
+                    item.down = downcount;
+                    localStorage.setItem("feedback", JSON.stringify(feedback));
+                    return true;}})) 
+                {
+                    return;
+                }    
+    feedback.push(localStorageItem);
+    localStorage.setItem("feedback", JSON.stringify(feedback));          
+})
+
+$('#infowindow').on("mousedown",".like, .dislike", (event)=> {
     $(event.target).addClass('active');
-    console.log($(event.target));
+})
+
+$('#infowindow').on("mouseup",".like, .dislike", (event)=> {
+    $('.active').removeClass('active');
 })
 
 async function hightlightMarker(event) {
@@ -333,6 +415,7 @@ cancelEl.addEventListener("click", function () {
     searchOptionEl.classList.add('hide');
 });
 
+
 // The event listener will process user's filter inputs when they click on the save button
 saveEl.addEventListener("click", function () {
     let freeEl = document.querySelector('#free');
@@ -382,38 +465,29 @@ let historyItemEl = document.querySelector('.historyItem');
 let previousSearch = JSON.parse(localStorage.getItem("previousSearch")) || [];
 
 // Adding a click event for the search button
-searchEl.addEventListener("submit", function (event) {
-    event.preventDefault();
-
+function saveHitory(location) {
     // Hide the search history feature when user clicks on the search button
     historyEl.classList.add('hide');
 
     // If the text input is an empty string, or is a repeat from the previous string, do not save the result in local storage
-    if (searchValueEl.value === '' || previousSearch.indexOf(searchValueEl.value) !== -1) {
+    if (searchValueEl.value === '' || previousSearch.find((item) => {return JSON.stringify(item.location) === JSON.stringify(location)})) {
         return
     }
-
+    var searchItem = {searchText: searchValueEl.value, location: location}
     // Adding the new search value to the top of the search history 
-    previousSearch.unshift(searchValueEl.value);
+    previousSearch.unshift(searchItem);
+
+    // Only showing the last 8 search history 
+    while (previousSearch.length > 5) {
+        previousSearch.pop();
+    }
 
     // Displaying the saved string lists from local storage
     localStorage.setItem("previousSearch", JSON.stringify(previousSearch));
-
     showHistory();
-
-    // Only showing the last 8 search history 
-    // if (previousSearch.length > 7) {
-    //     previousSearch.pop();
-    // }
-
     // Clearing the text input value once user submits
     searchValueEl.value = "";
-})
-
-// Adding a click event so that the search history feature will show up when user clicks on the text input box
-searchValueEl.addEventListener('click', function () {
-    historyEl.classList.remove('hide');
-})
+}
 
 function showHistory() {
 
@@ -429,62 +503,68 @@ function showHistory() {
         iconEl.setAttribute('class', 'fa-regular fa-clock');
 
         let aEl = document.createElement('a');
-        aEl.textContent = previousSearch[i];
+        aEl.textContent = previousSearch[i].searchText;
         // Setting a placeholder href value
         aEl.href = '#'; 
 
         aEl.addEventListener('click', function (event) {
             event.preventDefault();
-
-            showResultsOnMap(previousSearch[i]);
+            // showResultsOnMap(previousSearch[i]);
+            createLocation(previousSearch[i].location);
         });
-
         newDiv.append(iconEl, aEl);
-
         historyListEl.appendChild(newDiv);
     }
 }
 
-showHistory();
+// function showResultsOnMap(searchValue) {
+//     // Useing the PlacesService to perform a text-based search for the searchValue
+//     service.textSearch({
+//         query: searchValue
+//     }, function (results, status) {
+//         if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+//             // Assuming you want to display the first result on the map
+//             const firstResult = results[0];
+//             const location = firstResult.geometry.location;
 
+//             // Creating a marker to mark the location on the map
+//             const marker = new google.maps.Marker({
+//                 map: map,
+//                 position: location,
+//                 title: firstResult.name
+//             });
 
-function showResultsOnMap(searchValue) {
-    // Useing the PlacesService to perform a text-based search for the searchValue
-    service.textSearch({
-        query: searchValue
-    }, function (results, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-            // Assuming you want to display the first result on the map
-            const firstResult = results[0];
-            const location = firstResult.geometry.location;
+//             // Setting the map center and zoom to the location
+//             map.setCenter(location);
+//             map.setZoom(15);
 
-            // Creating a marker to mark the location on the map
-            const marker = new google.maps.Marker({
-                map: map,
-                position: location,
-                title: firstResult.name
-            });
+//             // Showing an info window with information about the place
+//             const infoContent = `<strong>${firstResult.name}</strong><br>${firstResult.formatted_address}`;
+//             infoWindow.setContent(infoContent);
+//             infoWindow.open(map, marker);
+//         } else {
+//             // Handling the case where no results were found
+//             alert('No results found for ' + searchValue);
+//         }
+//     })
+// }
 
-            // Setting the map center and zoom to the location
-            map.setCenter(location);
-            map.setZoom(15);
+// Adding a click event so that the search history feature will show up when user clicks on the text input box
+searchValueEl.addEventListener('focusin', function () {
+    if (searchValueEl.value == "") {
+        historyEl.classList.remove('hide');
+    }
+});
 
-            // Showing an info window with information about the place
-            const infoContent = `<strong>${firstResult.name}</strong><br>${firstResult.formatted_address}`;
-            infoWindow.setContent(infoContent);
-            infoWindow.open(map, marker);
-        } else {
-            // Handling the case where no results were found
-            alert('No results found for ' + searchValue);
-        }
-    })
-}
+searchValueEl.addEventListener('focusout', function () {
+    setTimeout(() => {
+        historyEl.classList.add('hide');
+    }, 100)
+})
 
 // Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history
 searchEl.addEventListener("keyup", function () {
-
     historyEl.classList.add('hide');
-
     if (searchValueEl.value === '') {
         return historyEl.classList.remove('hide');
     }
@@ -492,9 +572,9 @@ searchEl.addEventListener("keyup", function () {
 
 // Adding a click event for the history element, so that it will be hidden when clicked
 historyEl.addEventListener("click", function () {
-
     historyEl.classList.add('hide');
 })
+
 
 window.initMap = initMap;
 
