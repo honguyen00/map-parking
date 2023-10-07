@@ -52,14 +52,14 @@ async function initMap() {
     const options = {
         fields: ["formatted_address", "geometry", "name"],
         strictBounds: false,
-        componentRestrictions: {country: "au"}
+        componentRestrictions: { country: "au" }
     };
     var input = $("#search-address");
     const autocomplete = new google.maps.places.Autocomplete(input[0], options);
     searchMarker = new google.maps.Marker();
     $(".search-icon").on("click", (event) => {
         event.preventDefault();
-        if(input.val() != "") {
+        if (input.val() != "") {
             if (typeof autocomplete.getPlace() != typeof undefined) {
                 createLocation(autocomplete.getPlace().geometry.location);
                 saveHitory(autocomplete.getPlace().geometry.location);
@@ -117,23 +117,23 @@ function createLocation(place) {
 }
 
 async function searchParkingAroundRadius(position) {
-        var location = position.latLng.toJSON();
-        const search = {
-            location: { lat: location["lat"], lng: location["lng"] },
-            radius: radius,
-            keyword: "parking lot",
-        };
-        var moreButton = $("#more");
-        let getNextPage;
-        moreButton.on("click", function() {
-            moreButton.attr("disabled", true)
-            if (getNextPage) {
-                getNextPage();
-            }
-        }) 
-        var i = 0;
-        service.nearbySearch(search, (results, status, pagination) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && results) { 
+    var location = position.latLng.toJSON();
+    const search = {
+        location: { lat: location["lat"], lng: location["lng"] },
+        radius: radius,
+        keyword: "parking lot",
+    };
+    var moreButton = $("#more");
+    let getNextPage;
+    moreButton.on("click", function () {
+        moreButton.attr("disabled", true)
+        if (getNextPage) {
+            getNextPage();
+        }
+    })
+    var i = 0;
+    service.nearbySearch(search, (results, status, pagination) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && results) {
             addResultsToMap(results, i);
             moreButton.attr("disabled", (!pagination || !pagination.hasNextPage));
             if (pagination && pagination.hasNextPage) {
@@ -141,14 +141,14 @@ async function searchParkingAroundRadius(position) {
                     pagination.nextPage();
                     i += 20;
                 }
-            } 
+            }
         }
         else {
             handleLocationError(true, infoWindow, map.getCenter());
         }
-        })
-        map.setZoom(14);
-    }
+    })
+    map.setZoom(14);
+}
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
@@ -182,7 +182,7 @@ function clearResultMarkers() {
 async function addResultsToMap(results, i) {
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
     results.forEach(result => {
-        var markerNumber = i+1;
+        var markerNumber = i + 1;
         const pinBackground = new PinElement({
             background: "#031cfc",
             borderColor: "white",
@@ -197,21 +197,21 @@ async function addResultsToMap(results, i) {
 
         markers[i].placeResult = result;
         google.maps.event.addListener(markers[i], "click", showParkingInfo)
-        setTimeout(dropMarker(i), i*100);
+        setTimeout(dropMarker(i), i * 100);
         addResultsToDiv(result, i);
         i++;
     });
 }
 
 function addResultsToDiv(result, i) {
-        var markerNumber = i+1;
-        const rowEle = $("<tr>");
-        rowEle.on("click", () => {
-            google.maps.event.trigger(markers[i], "click");
-        })
-        var resultTd = $("<td class='result-item w-full'>" + markerNumber + ". " + result.name + "</td>");
-        rowEle.append(resultTd);
-        resultTable.append(rowEle);
+    var markerNumber = i + 1;
+    const rowEle = $("<tr>");
+    rowEle.on("click", () => {
+        google.maps.event.trigger(markers[i], "click");
+    })
+    var resultTd = $("<td class='result-item w-full'>" + markerNumber + ". " + result.name + "</td>");
+    rowEle.append(resultTd);
+    resultTable.append(rowEle);
 }
 
 
@@ -228,8 +228,8 @@ function showParkingInfo() {
         }
         parkingIW.open(map, marker);
         map.panTo(marker.placeResult.geometry.location);
-        map.setZoom(16 - (radius/1000));
-        buildIWContent(place); 
+        map.setZoom(16 - (radius / 1000));
+        buildIWContent(place);
     });
 }
 
@@ -240,12 +240,12 @@ function buildIWContent(place) {
     }
     var headDiv = $("<div class='mb-2'>")
     var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
-    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>");
+    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name + "</a>");
     headDiv.append(placeIcon, placeName);
     var placeAddress = $("<p class='mb-2'><strong>Address:</strong> " + place.vicinity + "</p>");
     infoDiv.append(headDiv[0], placeAddress[0]);
-    addPhotos(place, infoDiv, function() {
-        addRatingandFeedback(place,infoDiv);
+    addPhotos(place, infoDiv, function () {
+        addRatingandFeedback(place, infoDiv);
     });
 }
 
@@ -268,7 +268,7 @@ function addPhotos(place, infoDiv, callback) {
                         addressControl: false,
                         linksControl: false,
                         enableCloseButton: false,
-                        panControl: false,          
+                        panControl: false,
                     });
                     panorama.setPano(data.location.pano);
                     panorama.setPov({
@@ -288,14 +288,14 @@ function addRatingandFeedback(place, infoDiv) {
     var ratingHtml = "";
     var ratingLab = "<strong>Rating: </strong> ";
     if (place.rating) {
-        for (let i=0; i<5; i++) {
+        for (let i = 0; i < 5; i++) {
             if (place.rating < i + 0.5) {
                 ratingHtml += "&#10025;";
             }
             else {
                 ratingHtml += "&#10029;";
             }
-        } 
+        }
         ratingHtml += " (" + place.rating + ")";
     } else {
         ratingHtml = "(No ratings)"
@@ -306,7 +306,7 @@ function addRatingandFeedback(place, infoDiv) {
     var upcount = 0;
     var downcount = 0;
     var feedback = JSON.parse(localStorage.getItem("feedback"));
-    var savedLocation = {lat: $(currentFocusedMarker)[0].ln.lat, lng: $(currentFocusedMarker)[0].ln.lng};
+    var savedLocation = { lat: $(currentFocusedMarker)[0].ln.lat, lng: $(currentFocusedMarker)[0].ln.lng };
     if (feedback) {
         feedback.find((item) => {
             if (JSON.stringify(item.location) === JSON.stringify(savedLocation)) {
@@ -324,11 +324,11 @@ function addRatingandFeedback(place, infoDiv) {
     infoDiv.append(ratingDiv, accessFeedbackDiv);
 }
 
-$('#infowindow').on("click",".like, .dislike", (event)=> {
+$('#infowindow').on("click", ".like, .dislike", (event) => {
     event.preventDefault();
     // $('.active').removeClass('active');
     // $(event.target).addClass('active');
-    var savedLocation = {lat: $(currentFocusedMarker)[0].ln.lat, lng: $(currentFocusedMarker)[0].ln.lng};
+    var savedLocation = { lat: $(currentFocusedMarker)[0].ln.lat, lng: $(currentFocusedMarker)[0].ln.lng };
     var upcountEle = $("#upcount");
     var downcountEle = $("#downcount");
     var upcount = parseInt(upcountEle[0].textContent);
@@ -341,25 +341,27 @@ $('#infowindow').on("click",".like, .dislike", (event)=> {
         downcountEle[0].textContent = downcount;
     }
     // ===================================================================================================
-    var localStorageItem = {location: savedLocation, up: upcount, down: downcount};
+    var localStorageItem = { location: savedLocation, up: upcount, down: downcount };
     var feedback = JSON.parse(localStorage.getItem("feedback")) || [];
-    if (feedback.find((item) => {if (JSON.stringify(item.location) === JSON.stringify(savedLocation)) {
-                    item.up = upcount;
-                    item.down = downcount;
-                    localStorage.setItem("feedback", JSON.stringify(feedback));
-                    return true;}})) 
-                {
-                    return;
-                }    
+    if (feedback.find((item) => {
+        if (JSON.stringify(item.location) === JSON.stringify(savedLocation)) {
+            item.up = upcount;
+            item.down = downcount;
+            localStorage.setItem("feedback", JSON.stringify(feedback));
+            return true;
+        }
+    })) {
+        return;
+    }
     feedback.push(localStorageItem);
-    localStorage.setItem("feedback", JSON.stringify(feedback));          
+    localStorage.setItem("feedback", JSON.stringify(feedback));
 })
 
-$('#infowindow').on("mousedown",".like, .dislike", (event)=> {
+$('#infowindow').on("mousedown", ".like, .dislike", (event) => {
     $(event.target).addClass('active');
 })
 
-$('#infowindow').on("mouseup",".like, .dislike", (event)=> {
+$('#infowindow').on("mouseup", ".like, .dislike", (event) => {
     $('.active').removeClass('active');
 })
 
@@ -470,10 +472,10 @@ function saveHitory(location) {
     historyEl.classList.add('hide');
 
     // If the text input is an empty string, or is a repeat from the previous string, do not save the result in local storage
-    if (searchValueEl.value === '' || previousSearch.find((item) => {return JSON.stringify(item.location) === JSON.stringify(location)})) {
+    if (searchValueEl.value === '' || previousSearch.find((item) => { return JSON.stringify(item.location) === JSON.stringify(location) })) {
         return
     }
-    var searchItem = {searchText: searchValueEl.value, location: location}
+    var searchItem = { searchText: searchValueEl.value, location: location }
     // Adding the new search value to the top of the search history 
     previousSearch.unshift(searchItem);
 
@@ -489,6 +491,7 @@ function saveHitory(location) {
     searchValueEl.value = "";
 }
 
+
 function showHistory() {
 
     // Adding html elements into the historyList element
@@ -499,55 +502,32 @@ function showHistory() {
         let newDiv = document.createElement('div');
         newDiv.classList.add('historyItem');
 
+        // let container = document.createElement('div'); 
+        // container.classList.add('historyItemContainer'); 
+
         let iconEl = document.createElement('i');
         iconEl.setAttribute('class', 'fa-regular fa-clock');
 
         let aEl = document.createElement('a');
         aEl.textContent = previousSearch[i].searchText;
         // Setting a placeholder href value
-        aEl.href = '#'; 
+        aEl.href = '#';
 
         aEl.addEventListener('click', function (event) {
             event.preventDefault();
             // showResultsOnMap(previousSearch[i]);
             createLocation(previousSearch[i].location);
         });
-        newDiv.append(iconEl, aEl);
+
+        // Append the icon and anchor elements to the container
+        container.append(iconEl, aEl);
+
+        // Append the container to the newDiv
+        newDiv.appendChild(container);
+
         historyListEl.appendChild(newDiv);
     }
 }
-
-// function showResultsOnMap(searchValue) {
-//     // Useing the PlacesService to perform a text-based search for the searchValue
-//     service.textSearch({
-//         query: searchValue
-//     }, function (results, status) {
-//         if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-//             // Assuming you want to display the first result on the map
-//             const firstResult = results[0];
-//             const location = firstResult.geometry.location;
-
-//             // Creating a marker to mark the location on the map
-//             const marker = new google.maps.Marker({
-//                 map: map,
-//                 position: location,
-//                 title: firstResult.name
-//             });
-
-//             // Setting the map center and zoom to the location
-//             map.setCenter(location);
-//             map.setZoom(15);
-
-//             // Showing an info window with information about the place
-//             const infoContent = `<strong>${firstResult.name}</strong><br>${firstResult.formatted_address}`;
-//             infoWindow.setContent(infoContent);
-//             infoWindow.open(map, marker);
-//         } else {
-//             // Handling the case where no results were found
-//             alert('No results found for ' + searchValue);
-//         }
-//     })
-// }
 
 // Adding a click event so that the search history feature will show up when user clicks on the text input box
 searchValueEl.addEventListener('focusin', function () {
