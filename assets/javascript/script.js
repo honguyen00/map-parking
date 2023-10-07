@@ -5,7 +5,8 @@ let markers = [];
 var resultTable = $("#results");
 var parkingIW;
 var searchMarker;
-var radius;
+var radius = 1000;
+var isOpen = false;
 var currentFocusedMarker;
 
 // run after loading all html elements
@@ -122,6 +123,7 @@ async function searchParkingAroundRadius(position) {
             location: { lat: location["lat"], lng: location["lng"] },
             radius: radius,
             keyword: "parking lot",
+            openNow: isOpen,
         };
         var moreButton = $("#more");
         let getNextPage;
@@ -226,9 +228,10 @@ function showParkingInfo() {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
         }
+        console.log(place);
         parkingIW.open(map, marker);
         map.panTo(marker.placeResult.geometry.location);
-        map.setZoom(16 - (radius/1000));
+        map.setZoom(16);
         buildIWContent(place); 
     });
 }
@@ -243,6 +246,7 @@ function buildIWContent(place) {
     var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>");
     headDiv.append(placeIcon, placeName);
     var placeAddress = $("<p class='mb-2'><strong>Address:</strong> " + place.vicinity + "</p>");
+    var placeOpen = $("<p class='mb-2'><strong>Availability:</strong> " + place.vicinity + "</p>")
     infoDiv.append(headDiv[0], placeAddress[0]);
     addPhotos(place, infoDiv, function() {
         addRatingandFeedback(place,infoDiv);
@@ -406,50 +410,34 @@ let cancelEl = document.querySelector('.cancel-Btn');
 // Adding an event listener for when user clicks on the filter button
 filterEl.addEventListener("click", function (event) {
     event.preventDefault();
-
     searchOptionEl.classList.remove('hide');
 });
 
 // Adding an event listener to hide the modal when user clicks on the cancel button
-cancelEl.addEventListener("click", function () {
-    searchOptionEl.classList.add('hide');
-});
+// cancelEl.addEventListener("click", function () {
+//     searchOptionEl.classList.add('hide');
+// });
 
 
 // The event listener will process user's filter inputs when they click on the save button
 saveEl.addEventListener("click", function () {
-    let freeEl = document.querySelector('#free');
-    let paidEl = document.querySelector('#paid');
-    let accessibleEl = document.querySelector('#accessible');
-
-    let fiveEl = document.querySelector('#five');
-    let tenEl = document.querySelector('#ten');
-    let fiftenEl = document.querySelector('#fiften');
-    let twentyEl = document.querySelector('#twenty');
-
-    if (freeEl.checked === true) {
-        console.log(freeEl.value);
-    };
-
-    if (paidEl.checked === true) {
-        console.log(paidEl.value);
-    };
-
-    if (accessibleEl.checked === true) {
-        console.log(accessibleEl.value);
-    };
-
-    let radius;
-    if (fiveEl.checked === true) {
-        radius = fiveEl.value
-    } else if (tenEl.checked === true) {
-        radius = tenEl.value
-    } else if (fiftenEl.checked === true) {
-        radius = fiftenEl.value
+    if ($("#open-now")[0].checked) {
+        isOpen = true;
     } else {
-        radius = twentyEl.value
+        isOpen = false;
     }
-    console.log(radius);
+
+    if($("#1km")[0].checked) {
+        radius = $("#1km")[0].value;
+    } else if ($("#2km")[0].checked) {
+        radius = $("#2km")[0].value;
+    } else if ($("#3km")[0].checked) {
+        radius = $("#3km")[0].value;
+    } else if ($("#4km")[0].checked) {
+        radius = $("#4km")[0].value;
+    } else {
+        radius = $("#5km")[0].value;
+    }
 
     searchOptionEl.classList.add('hide');
 });
@@ -516,38 +504,6 @@ function showHistory() {
         historyListEl.appendChild(newDiv);
     }
 }
-
-// function showResultsOnMap(searchValue) {
-//     // Useing the PlacesService to perform a text-based search for the searchValue
-//     service.textSearch({
-//         query: searchValue
-//     }, function (results, status) {
-//         if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-//             // Assuming you want to display the first result on the map
-//             const firstResult = results[0];
-//             const location = firstResult.geometry.location;
-
-//             // Creating a marker to mark the location on the map
-//             const marker = new google.maps.Marker({
-//                 map: map,
-//                 position: location,
-//                 title: firstResult.name
-//             });
-
-//             // Setting the map center and zoom to the location
-//             map.setCenter(location);
-//             map.setZoom(15);
-
-//             // Showing an info window with information about the place
-//             const infoContent = `<strong>${firstResult.name}</strong><br>${firstResult.formatted_address}`;
-//             infoWindow.setContent(infoContent);
-//             infoWindow.open(map, marker);
-//         } else {
-//             // Handling the case where no results were found
-//             alert('No results found for ' + searchValue);
-//         }
-//     })
-// }
 
 // Adding a click event so that the search history feature will show up when user clicks on the text input box
 searchValueEl.addEventListener('focusin', function () {
