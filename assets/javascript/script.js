@@ -3,7 +3,7 @@ let service;
 let infoWindow;
 let markers = [];
 var resultTable = $("#results");
-var infoWindow1;
+var parkingIW;
 var searchMarker;
 var radius;
 var currentFocusedMarker;
@@ -46,7 +46,7 @@ async function initMap() {
             event.stop();
         }
     });
-    infoWindow1 = new google.maps.InfoWindow({
+    parkingIW = new google.maps.InfoWindow({
         content: document.getElementById("infowindow")
     })
     const options = {
@@ -62,6 +62,7 @@ async function initMap() {
         if(input.val() != "") {
             if (typeof autocomplete.getPlace() != typeof undefined) {
                 createLocation(autocomplete.getPlace().geometry.location);
+                saveHitory(autocomplete.getPlace().geometry.location);
                 input.val("");
             }
             else {
@@ -70,6 +71,7 @@ async function initMap() {
         }
     })
     radius = 1000;
+    showHistory();
 }
 
 // function to get the current position of user from the browser
@@ -225,7 +227,7 @@ function showParkingInfo() {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
         }
-        infoWindow1.open(map, marker);
+        parkingIW.open(map, marker);
         map.panTo(marker.placeResult.geometry.location);
         map.setZoom(16 - (radius/1000));
         buildIWContent(place); 
@@ -341,26 +343,17 @@ $('#infowindow').on("click",".like, .dislike", (event)=> {
     }
     // ===================================================================================================
     var localStorageItem = {location: savedLocation, up: upcount, down: downcount};
-    var feedback = JSON.parse(localStorage.getItem("feedback"));
-    if (!feedback) {
-        var feedback = [];
-        feedback.push(localStorageItem);
-        localStorage.setItem("feedback", JSON.stringify(feedback));
-    } else {
-        var duplicate = feedback.find((item) => {
-            if (JSON.stringify(item.location) === JSON.stringify(savedLocation)) {
-                item.up = upcount;
-                item.down = downcount;
-                localStorage.setItem("feedback", JSON.stringify(feedback));
-                return true;
-            }
-        });
-        if (!duplicate) {
-            feedback.push(localStorageItem);
-            localStorage.setItem("feedback", JSON.stringify(feedback));
-            return;
-        }
-    }
+    var feedback = JSON.parse(localStorage.getItem("feedback")) || [];
+    if (feedback.find((item) => {if (JSON.stringify(item.location) === JSON.stringify(savedLocation)) {
+                    item.up = upcount;
+                    item.down = downcount;
+                    localStorage.setItem("feedback", JSON.stringify(feedback));
+                    return true;}})) 
+                {
+                    return;
+                }    
+    feedback.push(localStorageItem);
+    localStorage.setItem("feedback", JSON.stringify(feedback));          
 })
 
 $('#infowindow').on("mousedown",".like, .dislike", (event)=> {
@@ -423,6 +416,7 @@ cancelEl.addEventListener("click", function () {
     searchOptionEl.classList.add('hide');
 });
 
+
 // The event listener will process user's filter inputs when they click on the save button
 saveEl.addEventListener("click", function () {
     let freeEl = document.querySelector('#free');
@@ -472,19 +466,17 @@ let historyItemEl = document.querySelector('.historyItem');
 let previousSearch = JSON.parse(localStorage.getItem("previousSearch")) || [];
 
 // Adding a click event for the search button
-searchEl.addEventListener("submit", function (event) {
-    event.preventDefault();
-
+function saveHitory(location) {
     // Hide the search history feature when user clicks on the search button
     historyEl.classList.add('hide');
 
     // If the text input is an empty string, or is a repeat from the previous string, do not save the result in local storage
-    if (searchValueEl.value === '' || previousSearch.indexOf(searchValueEl.value) !== -1) {
+    if (searchValueEl.value === '' || previousSearch.find((item) => {return JSON.stringify(item.location) === JSON.stringify(location)})) {
         return
     }
-
+    var searchItem = {searchText: searchValueEl.value, location: location}
     // Adding the new search value to the top of the search history 
-    previousSearch.unshift(searchValueEl.value);
+    previousSearch.unshift(searchItem);
 
     // Displaying the saved string lists from local storage
     localStorage.setItem("previousSearch", JSON.stringify(previousSearch));
@@ -498,12 +490,7 @@ searchEl.addEventListener("submit", function (event) {
 
     // Clearing the text input value once user submits
     searchValueEl.value = "";
-})
-
-// Adding a click event so that the search history feature will show up when user clicks on the text input box
-searchValueEl.addEventListener('click', function () {
-    historyEl.classList.remove('hide');
-})
+}
 
 function showHistory() {
 
@@ -519,62 +506,66 @@ function showHistory() {
         iconEl.setAttribute('class', 'fa-regular fa-clock');
 
         let aEl = document.createElement('a');
-        aEl.textContent = previousSearch[i];
+        aEl.textContent = previousSearch[i].searchText;
         // Setting a placeholder href value
         aEl.href = '#'; 
 
         aEl.addEventListener('click', function (event) {
             event.preventDefault();
-
-            showResultsOnMap(previousSearch[i]);
+            // showResultsOnMap(previousSearch[i]);
+            createLocation(previousSearch[i].location);
         });
-
         newDiv.append(iconEl, aEl);
-
         historyListEl.appendChild(newDiv);
     }
 }
 
-showHistory();
+// function showResultsOnMap(searchValue) {
+//     // Useing the PlacesService to perform a text-based search for the searchValue
+//     service.textSearch({
+//         query: searchValue
+//     }, function (results, status) {
+//         if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+//             // Assuming you want to display the first result on the map
+//             const firstResult = results[0];
+//             const location = firstResult.geometry.location;
 
+//             // Creating a marker to mark the location on the map
+//             const marker = new google.maps.Marker({
+//                 map: map,
+//                 position: location,
+//                 title: firstResult.name
+//             });
 
-function showResultsOnMap(searchValue) {
-    // Useing the PlacesService to perform a text-based search for the searchValue
-    service.textSearch({
-        query: searchValue
-    }, function (results, status) {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
-            // Assuming you want to display the first result on the map
-            const firstResult = results[0];
-            const location = firstResult.geometry.location;
+//             // Setting the map center and zoom to the location
+//             map.setCenter(location);
+//             map.setZoom(15);
 
-            // Creating a marker to mark the location on the map
-            const marker = new google.maps.Marker({
-                map: map,
-                position: location,
-                title: firstResult.name
-            });
+//             // Showing an info window with information about the place
+//             const infoContent = `<strong>${firstResult.name}</strong><br>${firstResult.formatted_address}`;
+//             infoWindow.setContent(infoContent);
+//             infoWindow.open(map, marker);
+//         } else {
+//             // Handling the case where no results were found
+//             alert('No results found for ' + searchValue);
+//         }
+//     })
+// }
 
-            // Setting the map center and zoom to the location
-            map.setCenter(location);
-            map.setZoom(15);
+// Adding a click event so that the search history feature will show up when user clicks on the text input box
+searchValueEl.addEventListener('focusin', function () {
+    if (searchValueEl.value == "") {
+        historyEl.classList.remove('hide');
+    }
+});
 
-            // Showing an info window with information about the place
-            const infoContent = `<strong>${firstResult.name}</strong><br>${firstResult.formatted_address}`;
-            infoWindow.setContent(infoContent);
-            infoWindow.open(map, marker);
-        } else {
-            // Handling the case where no results were found
-            alert('No results found for ' + searchValue);
-        }
-    })
-}
+// searchValueEl.addEventListener('focusout', function () {
+//     historyEl.classList.add('hide');
+// })
 
 // Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history
 searchEl.addEventListener("keyup", function () {
-
     historyEl.classList.add('hide');
-
     if (searchValueEl.value === '') {
         return historyEl.classList.remove('hide');
     }
@@ -582,9 +573,9 @@ searchEl.addEventListener("keyup", function () {
 
 // Adding a click event for the history element, so that it will be hidden when clicked
 historyEl.addEventListener("click", function () {
-
     historyEl.classList.add('hide');
 })
+
 
 window.initMap = initMap;
 

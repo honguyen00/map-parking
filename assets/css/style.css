@@ -73,8 +73,10 @@ side {
 
 #search-bar {
     border: 1px solid currentColor;
-    border-radius: 8px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
     padding: 5px 60px 5px 5px;
+    box-shadow: 1px 1px 0 1px var(--darkgray);
     position: relative;
 }
 
@@ -209,11 +211,6 @@ tr:nth-child(even) {
     column-gap: 5px;
 }
 
-/* .dislike:hover, .like:hover {
-    color: var(--neon-blue);
-    transition: all .2s ease-in-out;
-} */
-
 .active {
     color: var(--neon-blue);
 }
@@ -226,12 +223,14 @@ tr:nth-child(even) {
     height: 300px;
     background-color: var(--gray);
     width: 100%;
-    border-radius: 3px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
     box-shadow: 1px 1px 0 2px var(--darkgray);
     overflow: hidden;
-    /* position: absolute; */
-    bottom: auto;
-    top: auto;
+    position: absolute;
+    top: 34px;
+    left: 0px;
+    z-index: 5;
 }
 
 .history h2 {
