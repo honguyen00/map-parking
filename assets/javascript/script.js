@@ -428,10 +428,18 @@ function showHistory() {
         let iconEl = document.createElement('i');
         iconEl.setAttribute('class', 'fa-regular fa-clock');
 
-        let pEl = document.createElement('button');
-        pEl.textContent = previousSearch[i];
+        let aEl = document.createElement('a');
+        aEl.textContent = previousSearch[i];
+        // Setting a placeholder href value
+        aEl.href = '#'; 
 
-        newDiv.append(iconEl, pEl);
+        aEl.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            showResultsOnMap(previousSearch[i]);
+        });
+
+        newDiv.append(iconEl, aEl);
 
         historyListEl.appendChild(newDiv);
     }
@@ -439,7 +447,40 @@ function showHistory() {
 
 showHistory();
 
-// Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history.
+
+function showResultsOnMap(searchValue) {
+    // Useing the PlacesService to perform a text-based search for the searchValue
+    service.textSearch({
+        query: searchValue
+    }, function (results, status) {
+        if (status === google.maps.places.PlacesServiceStatus.OK && results.length > 0) {
+            // Assuming you want to display the first result on the map
+            const firstResult = results[0];
+            const location = firstResult.geometry.location;
+
+            // Creating a marker to mark the location on the map
+            const marker = new google.maps.Marker({
+                map: map,
+                position: location,
+                title: firstResult.name
+            });
+
+            // Setting the map center and zoom to the location
+            map.setCenter(location);
+            map.setZoom(15);
+
+            // Showing an info window with information about the place
+            const infoContent = `<strong>${firstResult.name}</strong><br>${firstResult.formatted_address}`;
+            infoWindow.setContent(infoContent);
+            infoWindow.open(map, marker);
+        } else {
+            // Handling the case where no results were found
+            alert('No results found for ' + searchValue);
+        }
+    })
+}
+
+// Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history
 searchEl.addEventListener("keyup", function () {
 
     historyEl.classList.add('hide');
@@ -449,7 +490,11 @@ searchEl.addEventListener("keyup", function () {
     }
 })
 
+// Adding a click event for the history element, so that it will be hidden when clicked
+historyEl.addEventListener("click", function () {
 
+    historyEl.classList.add('hide');
+})
 
 window.initMap = initMap;
 

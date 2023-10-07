@@ -195,18 +195,16 @@ tr:hover {
 }
 
 .history {
-    height: 310px;
-    top: 50px;
+    height: 300px;
     background-color: var(--gray);
     width: 100%;
     border-radius: 3px;
     box-shadow: 1px 1px 0 2px var(--darkgray);
     overflow: hidden;
+    /* position: absolute; */
+    bottom: auto;
+    top: auto;
 }
-
-/* .search-container:focus-within .history {
-    display: block;
-} */
 
 .history h2 {
     font-size: 15px;
@@ -224,12 +222,12 @@ tr:hover {
     font-size: 15px;
 }
 
-.history button {
+.history a {
     font-size: 15px;
     padding-left: 10px;
     margin: 5px;
 }
 
-.history button:hover {
+.history a:hover {
 color: var(--blue);
 }
