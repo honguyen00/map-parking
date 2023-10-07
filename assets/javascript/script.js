@@ -56,9 +56,6 @@ async function initMap() {
     };
     var input = $("#search-address");
     const autocomplete = new google.maps.places.Autocomplete(input[0], options);
-    // autocomplete.addListener("place_changed", ()=> {
-    //     createLocation(autocomplete.getPlace().geometry.location)
-    // });
     searchMarker = new google.maps.Marker();
     $(".search-icon").on("click", (event) => {
         event.preventDefault();
