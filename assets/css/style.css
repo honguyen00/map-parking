@@ -191,7 +191,7 @@ tr:nth-child(even) {
 }
 
 .streetview {
-    width: 500px;
+    width: 100%;
     height: 200px;
     margin: 0 auto;
 }
@@ -203,10 +203,10 @@ tr:nth-child(even) {
     column-gap: 5px;
 }
 
-.dislike:hover, .like:hover {
+/* .dislike:hover, .like:hover {
     color: var(--neon-blue);
     transition: all .2s ease-in-out;
-}
+} */
 
 .active {
     color: var(--neon-blue);

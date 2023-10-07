@@ -5,6 +5,8 @@ let markers = [];
 var resultTable = $("#results");
 var infoWindow1;
 var searchMarker;
+var radius;
+var currentFocusedMarker;
 
 // run after loading all html elements
 $(function () {
@@ -70,6 +72,7 @@ async function initMap() {
             }
         }
     })
+    radius = 1000;
 }
 
 // function to get the current position of user from the browser
@@ -104,7 +107,7 @@ function createLocation(place) {
     clearResults();
     clearSearchMarker();
     clearResultMarkers();
-    map.setCenter(place);
+    map.panTo(place);
     map.setZoom(12)
     searchMarker = new google.maps.Marker({
         map: map,
@@ -118,7 +121,7 @@ async function searchParkingAroundRadius(position) {
         var location = position.latLng.toJSON();
         const search = {
             location: { lat: location["lat"], lng: location["lng"] },
-            radius: 1000,
+            radius: radius,
             keyword: "parking lot",
         };
         var moreButton = $("#more");
@@ -145,6 +148,7 @@ async function searchParkingAroundRadius(position) {
             handleLocationError(true, infoWindow, map.getCenter());
         }
         })
+        map.setZoom(14);
     }
 
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -218,12 +222,15 @@ function clearResults() {
 }
 
 function showParkingInfo() {
+    currentFocusedMarker = this;
     const marker = this;
     service.getDetails({ placeId: marker.placeResult.place_id }, (place, status) => {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
         }
         infoWindow1.open(map, marker);
+        map.panTo(marker.placeResult.geometry.location);
+        map.setZoom(16 - (radius/1000));
         buildIWContent(place); 
     });
 }
@@ -297,17 +304,74 @@ function addRatingandFeedback(place, infoDiv) {
     }
     var ratingDiv = $("<div>" + ratingLab + ratingHtml + "</div>");
     var accessFeedbackDiv = $("<div class='feedback'>")
-    var accessFeedbackLabel = $("<div>Does this place have disabled parking spaces and/or wheelchair accessible? </div>");
-    var up = $("<button class='like'><i class='fa fa-thumbs-up' aria-hidden='true'></i></button>");
-    var down = $("<button class='dislike'><i class='fa fa-thumbs-down' aria-hidden='true'></i></button>");
-    accessFeedbackDiv.append(accessFeedbackLabel, up, down)
+    var accessFeedbackLabel = $("<p>Does this place have disabled parking spaces and/or wheelchair accessible? </p>");
+    var upcount = 0;
+    var downcount = 0;
+    var feedback = JSON.parse(localStorage.getItem("feedback"));
+    var savedLocation = {lat: $(currentFocusedMarker)[0].ln.lat, lng: $(currentFocusedMarker)[0].ln.lng};
+    if (feedback) {
+        feedback.find((item) => {
+            if (JSON.stringify(item.location) === JSON.stringify(savedLocation)) {
+                upcount = item.up;
+                downcount = item.down;
+                return;
+            }
+        })
+    }
+    var up = $("<button class='like my-auto'><i class='fa fa-thumbs-up' aria-hidden='true'></i></button>");
+    var upCountDiv = $("<div class='my-auto'>(<span id='upcount'>" + upcount + "</span>)</div>");
+    var down = $("<button class='dislike my-auto'><i class='fa fa-thumbs-down' aria-hidden='true'></i></button>");
+    var downCountDiv = $("<div class='my-auto'>(<span id='downcount'>" + downcount + "</span>)</div>");
+    accessFeedbackDiv.append(accessFeedbackLabel, up, upCountDiv, down, downCountDiv)
     infoDiv.append(ratingDiv, accessFeedbackDiv);
 }
 
 $('#infowindow').on("click",".like, .dislike", (event)=> {
     event.preventDefault();
-    $('.active').removeClass('active');
+    // $('.active').removeClass('active');
+    // $(event.target).addClass('active');
+    var savedLocation = {lat: $(currentFocusedMarker)[0].ln.lat, lng: $(currentFocusedMarker)[0].ln.lng};
+    var upcountEle = $("#upcount");
+    var downcountEle = $("#downcount");
+    var upcount = parseInt(upcountEle[0].textContent);
+    var downcount = parseInt(downcountEle[0].textContent);
+    if ($(event.target).attr("class") === 'fa fa-thumbs-up') {
+        upcount++;
+        upcountEle[0].textContent = upcount;
+    } else {
+        downcount++;
+        downcountEle[0].textContent = downcount;
+    }
+    // ===================================================================================================
+    var localStorageItem = {location: savedLocation, up: upcount, down: downcount};
+    var feedback = JSON.parse(localStorage.getItem("feedback"));
+    if (!feedback) {
+        var feedback = [];
+        feedback.push(localStorageItem);
+        localStorage.setItem("feedback", JSON.stringify(feedback));
+    } else {
+        var duplicate = feedback.find((item) => {
+            if (JSON.stringify(item.location) === JSON.stringify(savedLocation)) {
+                item.up = upcount;
+                item.down = downcount;
+                localStorage.setItem("feedback", JSON.stringify(feedback));
+                return true;
+            }
+        });
+        if (!duplicate) {
+            feedback.push(localStorageItem);
+            localStorage.setItem("feedback", JSON.stringify(feedback));
+            return;
+        }
+    }
+})
+
+$('#infowindow').on("mousedown",".like, .dislike", (event)=> {
     $(event.target).addClass('active');
+})
+
+$('#infowindow').on("mouseup",".like, .dislike", (event)=> {
+    $('.active').removeClass('active');
 })
 
 async function hightlightMarker(event) {
