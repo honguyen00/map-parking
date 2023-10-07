@@ -16,17 +16,17 @@
     <title>Parking with Access</title>
 </head>
 
-<body>
+<body class="flex flex-col">
     <header class="header flex flex-row justify-between items-center p-4">
         <h1 class="text-3xl md:text-4xl lg:text-6xl text-left" onclick="window.location.reload()">Parking with Access
         </h1>
         <a href="https://github.com/honguyen00/map-parking">About us</a>
     </header>
-
-    <main class="main-container flex flex-col md:flex-row">
-        <side class="search-container w-full md:w-1/3 lg:w-1/4 xl:w-1/5">
+    <main class="grow">
+        <div class="main-container h-full flex flex-col md:flex-row">
+        <side class="search-container w-full max-h-96 md:w-1/3 md:max-h-full lg:w-1/4 xl:w-1/5">
             <form id="search-bar">
-                <input type="text" id="search-address" placeholder="Search location" />
+                <input type="text" id="search-address" placeholder="Search for a location" />
                 <button id="filter-Btn" type="button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path
@@ -98,28 +98,28 @@
                         </div>
                     </div>
                 </div>
-            </form>
-
-            <div class="history hide" id="history">
+                <div class="history hide" id="history">
                 <h2>Search History</h2>
                 <div class="historyList">
                 </div>
             </div>
-
-            <div class="search-result w-100">
+            </form>
+            <h2 class="text-2xl mx-auto font-bold mt-4">Results:</h2>
+            <div class="search-result w-100 max-h-full flex flex-col overflow-y-auto mt-4">
                 <table class="min-w-full" id="result-table">
                     <tbody id="results"></tbody>
                 </table>
             </div>
-
+            <button class='rounded-lg border-2 border-solid border-gray-100 px-1 mx-auto mt-4' id="more">Load more results</button>
         </side>
-        <article class="map-container w-full h-full md:w-2/3 lg:w-3/4 xl:w-4/5" id="map-container">
+        <article class="map-container w-full md:w-2/3 lg:w-3/4 xl:w-4/5" id="map-container">
             <div id="map"></div>
         </article>
         <div style="display: none;">
             <div id="infowindow">
             </div>
         </div>
+    </div>
     </main>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script
