@@ -198,7 +198,6 @@ async function addResultsToMap(results, i) {
         markers[i].placeResult = result;
         google.maps.event.addListener(markers[i], "click", showParkingInfo)
         setTimeout(dropMarker(i), i*100);
-        // addResultsToMap(results[i], i);
         addResultsToDiv(result, i);
         i++;
     });
@@ -484,7 +483,7 @@ function saveHitory(location) {
     showHistory();
 
     // Only showing the last 8 search history 
-    if (previousSearch.length > 7) {
+    if (previousSearch.length > 5) {
         previousSearch.pop();
     }
 
