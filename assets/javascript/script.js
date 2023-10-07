@@ -116,7 +116,10 @@ function createLocation(place) {
     searchMarker.addListener("dblclick", searchParkingAroundRadius, { passive: true })
 }
 
-async function searchParkingAroundRadius(position) {
+async function searchParkingAroundRadius(position, radius) {
+    clearResults();
+    clearResultMarkers();
+
     var location = position.latLng.toJSON();
     const search = {
         location: { lat: location["lat"], lng: location["lng"] },
@@ -426,7 +429,7 @@ saveEl.addEventListener("click", function () {
 
     let fiveEl = document.querySelector('#five');
     let tenEl = document.querySelector('#ten');
-    let fiftenEl = document.querySelector('#fifteen');
+    let fifteenEl = document.querySelector('#fifteen');
     let twentyEl = document.querySelector('#twenty');
 
     if (freeEl.checked === true) {
@@ -441,20 +444,28 @@ saveEl.addEventListener("click", function () {
         console.log(accessibleEl.value);
     };
 
-    let selectedRadius;
+    // let radius;
     if (fiveEl.checked === true) {
-        selectedRadius = fiveEl.value
+        radius = fiveEl.value
     } else if (tenEl.checked === true) {
-        selectedRadius = tenEl.value
+        radius = tenEl.value
     } else if (fifteenEl.checked === true) {
-        selectedRadius = fifteenEl.value
+        radius = fifteenEl.value
     } else {
-        selectedRadius = twentyEl.value
+        radius = twentyEl.value
     }
-    console.log(selectedRadius);
+    console.log(radius);
+
+    // Clear existing results and perform a new search with the selected radius
+    clearResults();
+    searchParkingAroundRadius(searchMarker.getPosition(), radius);
 
     searchOptionEl.classList.add('hide');
 });
+
+
+
+
 
 // Defining the variables for search history features
 let historyEl = document.querySelector('.history');
@@ -502,8 +513,8 @@ function showHistory() {
         let newDiv = document.createElement('div');
         newDiv.classList.add('historyItem');
 
-        // let container = document.createElement('div'); 
-        // container.classList.add('historyItemContainer'); 
+        let container = document.createElement('div'); 
+        container.classList.add('historyItemContainer'); 
 
         let iconEl = document.createElement('i');
         iconEl.setAttribute('class', 'fa-regular fa-clock');
