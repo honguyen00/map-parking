@@ -477,16 +477,14 @@ function saveHitory(location) {
     // Adding the new search value to the top of the search history 
     previousSearch.unshift(searchItem);
 
-    // Displaying the saved string lists from local storage
-    localStorage.setItem("previousSearch", JSON.stringify(previousSearch));
-
-    showHistory();
-
     // Only showing the last 8 search history 
-    if (previousSearch.length > 5) {
+    while (previousSearch.length > 5) {
         previousSearch.pop();
     }
 
+    // Displaying the saved string lists from local storage
+    localStorage.setItem("previousSearch", JSON.stringify(previousSearch));
+    showHistory();
     // Clearing the text input value once user submits
     searchValueEl.value = "";
 }
@@ -558,9 +556,11 @@ searchValueEl.addEventListener('focusin', function () {
     }
 });
 
-// searchValueEl.addEventListener('focusout', function () {
-//     historyEl.classList.add('hide');
-// })
+searchValueEl.addEventListener('focusout', function () {
+    setTimeout(() => {
+        historyEl.classList.add('hide');
+    }, 100)
+})
 
 // Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history
 searchEl.addEventListener("keyup", function () {

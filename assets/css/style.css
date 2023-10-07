@@ -220,7 +220,7 @@ tr:nth-child(even) {
 }
 
 .history {
-    height: 200px;
+    height: fit-content;
     background-color: var(--gray);
     width: 100%;
     border-bottom-right-radius: 5px;
