@@ -4,6 +4,15 @@ let infoWindow;
 let markers = [];
 var resultTable = $("#results");
 var infoWindow1;
+let currentPage = 1;
+const resultsPerPage = 5;
+let pagination;
+
+
+// run after loading all html elements
+$(function () {
+    window.initMap = initMap;
+})
 
 // declare map, infoWindow, and service using google.api
 async function initMap() {
@@ -38,10 +47,18 @@ async function initMap() {
             event.stop();
         }
     });
+    infoWindow1 = new google.maps.InfoWindow({
+        content: document.getElementById("infowindow")
+    })
+    const options = {
+        fields: ["formatted_address", "geometry", "name"],
+        strictBounds: false,
+    };
     var input = $("#search-address")[0];
-    const autocomplete = new google.maps.places.Autocomplete(input, options);
-    autocomplete.addListener("place_changed", ()=> {
+    const autocomplete = new google.maps.places.Autocomplete(input);
+    autocomplete.addListener("place_changed", () => {
         console.log(autocomplete.getPlace());
+        createLocation(autocomplete.getPlace().geometry.location)
     })
 }
 
@@ -118,7 +135,7 @@ async function searchParkingAroundRadius(position) {
                     markers[i].placeResult = results[i];
                     // markers[i].addListener("click", showParkingInfo);
                     google.maps.event.addListener(markers[i], "click", showParkingInfo)
-                    setTimeout(dropMarker(i), i*100);
+                    setTimeout(dropMarker(i), i * 100);
                     addResult(results[i], i);
                 }
                 map.setCenter(markers[0].position);
@@ -155,7 +172,7 @@ function clearMarkers() {
 }
 
 function addResult(result, i) {
-    const markerNumber = i+1;
+    const markerNumber = i + 1;
     const rowEle = $("<tr>");
     rowEle.on("click", () => {
         google.maps.event.trigger(markers[i], "click")
@@ -177,7 +194,7 @@ function showParkingInfo() {
         }
         console.log(place)
         infoWindow1.open(map, marker);
-        buildIWContent(place); 
+        buildIWContent(place);
     });
 }
 
@@ -188,62 +205,66 @@ function buildIWContent(place) {
     }
     var headDiv = $("<div class='mb-2'>")
     var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
-    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>");
+    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name + "</a>");
     headDiv.append(placeIcon, placeName);
     var placeAddress = $("<p class='mb-2'><strong>Address:</strong> " + place.vicinity + "</p>");
     infoDiv.append(headDiv[0], placeAddress[0]);
-    addPhotos(place, infoDiv, function() {
-        addRatingandFeedback(place,infoDiv);
+    addPhotos(place, infoDiv, function () {
+        addRatingandFeedback(place, infoDiv);
     });
 }
 
 function addPhotos(place, infoDiv, callback) {
     var sv = new google.maps.StreetViewService();
-    var direction = new google.maps.DirectionsService();
-    var request = {
-        origin: place.geometry.location,
-        destination: place.geometry.location,
-        travelMode: 'DRIVING'
-    };
-    direction.route(request, (result, status) => {
-        if (status == 'OK') {
-            var location = result.routes[0].legs[0].start_location;
-            var streetviewDiv = $("<div class='streetview mb-2'>");
-            sv.getPanoramaByLocation(location, 50, (data, status) => {
-                if (status == 'OK') {
-                    var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
-                    const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
-                        addressControl: false,
-                        linksControl: false,
-                        enableCloseButton: false,
-                        panControl: false,          
-                    });
-                    panorama.setPano(data.location.pano);
-                    panorama.setPov({
-                        heading: heading,
-                        pitch: -20,
-                    });
-                    panorama.setVisible(true);
-                    infoDiv.append(streetviewDiv);
-                    callback();
-                }
-            })
-        }
-    })
+    if (!place.photos) {
+        var direction = new google.maps.DirectionsService();
+        var request = {
+            origin: place.geometry.location,
+            destination: place.geometry.location,
+            travelMode: 'DRIVING'
+        };
+        direction.route(request, (result, status) => {
+            if (status == 'OK') {
+                var location = result.routes[0].legs[0].start_location;
+                var streetviewDiv = $("<div class='streetview mb-2'>");
+                sv.getPanoramaByLocation(location, 50, (data, status) => {
+                    if (status == 'OK') {
+                        var heading = google.maps.geometry.spherical.computeHeading(data.location.latLng, place.geometry.location);
+                        const panorama = new google.maps.StreetViewPanorama(streetviewDiv[0], {
+                            addressControl: false,
+                            linksControl: false,
+                            enableCloseButton: false,
+                            panControl: false,
+                        });
+                        panorama.setPano(data.location.pano);
+                        panorama.setPov({
+                            heading: heading,
+                            pitch: -20,
+                        });
+                        panorama.setVisible(true);
+                        infoDiv.append(streetviewDiv);
+                        callback();
+                    }
+                })
+            }
+        })
+    } else {
+        var photoDiv;
+    }
 }
 
 function addRatingandFeedback(place, infoDiv) {
     var ratingHtml = "";
     var ratingLab = "<strong>Rating: </strong> ";
     if (place.rating) {
-        for (let i=0; i<5; i++) {
+        for (let i = 0; i < 5; i++) {
             if (place.rating < i + 0.5) {
                 ratingHtml += "&#10025;";
             }
             else {
                 ratingHtml += "&#10029;";
             }
-        } 
+        }
         ratingHtml += " (" + place.rating + ")";
     } else {
         ratingHtml = "(No ratings)"
@@ -257,7 +278,7 @@ function addRatingandFeedback(place, infoDiv) {
     infoDiv.append(ratingDiv, accessFeedbackDiv);
 }
 
-$('#infowindow').on("click",".like, .dislike", (event)=> {
+$('#infowindow').on("click", ".like, .dislike", (event) => {
     event.preventDefault();
     $('.active').removeClass('active');
     $(event.target).addClass('active');
@@ -298,22 +319,25 @@ async function hightlightMarker(event) {
 resultTable.on("mouseover", hightlightMarker)
 resultTable.on("mouseout", hightlightMarker)
 
-
+// Defining the variables for the filter options
 let filterEl = document.getElementById('filter-Btn');
 let searchOptionEl = document.querySelector('.search-option');
 let saveEl = document.querySelector('.save-Btn');
 let cancelEl = document.querySelector('.cancel-Btn');
 
+// Adding an event listener for when user clicks on the filter button
 filterEl.addEventListener("click", function (event) {
     event.preventDefault();
 
     searchOptionEl.classList.remove('hide');
 });
 
+// Adding an event listener to hide the modal when user clicks on the cancel button
 cancelEl.addEventListener("click", function () {
     searchOptionEl.classList.add('hide');
 });
 
+// The event listener will process user's filter inputs when they click on the save button
 saveEl.addEventListener("click", function () {
     let freeEl = document.querySelector('#free');
     let paidEl = document.querySelector('#paid');
@@ -351,6 +375,118 @@ saveEl.addEventListener("click", function () {
     searchOptionEl.classList.add('hide');
 });
 
+// Defining the variables for search history features
+let historyEl = document.querySelector('.history');
+let historyListEl = document.querySelector('.historyList');
+let searchValueEl = document.getElementById('search-address');
+let searchEl = document.getElementById('search-bar');
+let historyItemEl = document.querySelector('.historyItem');
+
+// Saving the search history in local storage
+let previousSearch = JSON.parse(localStorage.getItem("previousSearch")) || [];
+
+// Adding a click event for the search button
+searchEl.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    // Hide the search history feature when user clicks on the search button
+    historyEl.classList.add('hide');
+
+    // If the text input is an empty string, or is a repeat from the previous string, do not save the result in local storage
+    if (searchValueEl.value === '' || previousSearch.indexOf(searchValueEl.value) !== -1) {
+        return
+    }
+
+    // Adding the new search value to the top of the search history 
+    previousSearch.unshift(searchValueEl.value);
+
+    // Displaying the saved string lists from local storage
+    localStorage.setItem("previousSearch", JSON.stringify(previousSearch));
+
+    showHistory();
+
+    // Only showing the last 8 search history 
+    if (previousSearch.length > 7) {
+        previousSearch.pop();
+    }
+
+    // Clearing the text input value once user submits
+    searchValueEl.value = "";
+})
+
+// Adding a click event so that the search history feature will show up when user clicks on the text input box
+searchValueEl.addEventListener('click', function () {
+    historyEl.classList.remove('hide');
+})
+
+function showHistory() {
+
+    // Adding html elements into the historyList element
+    historyListEl.innerHTML = '';
+
+    // Creating a for loop and all the elements required for the user input
+    for (let i = 0; i < previousSearch.length; i++) {
+        let newDiv = document.createElement('div');
+        newDiv.classList.add('historyItem');
+
+        let iconEl = document.createElement('i');
+        iconEl.setAttribute('class', 'fa-regular fa-clock');
+
+        let pEl = document.createElement('button');
+        pEl.textContent = previousSearch[i];
+
+        newDiv.append(iconEl, pEl);
+
+        historyListEl.appendChild(newDiv);
+    }
+}
+
+showHistory();
+
+// Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history.
+searchEl.addEventListener("keyup", function () {
+
+    historyEl.classList.add('hide');
+
+    if (searchValueEl.value === '') {
+        return historyEl.classList.remove('hide');
+    }
+})
+
+
 
 window.initMap = initMap;
 
+//weather
+const apiKey = '0999ee04306ae06d9439492c7a4ecf1f';
+const city = 'Sydney'; 
+
+   // Function to get weather data from OpenWeatherMap API
+   const getWeatherData = async () => {
+       try {
+           const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+           const data = await response.json();
+           return data;
+       } catch (error) {
+           console.error('Error fetching weather data:', error);
+       }
+   };
+
+   // Function to update the weather information on the page
+   const updateWeatherInfo = async () => {
+       const weatherContainer = document.getElementById('weather-container');
+       const weatherInfoElement = document.getElementById('weather-info');
+
+       const weatherData = await getWeatherData();
+
+       if (weatherData) {
+           const temperature = weatherData.main.temp;
+           const description = weatherData.weather[0].description;
+
+           const weatherInfo = `Temperature: ${temperature}°C, ${description}`;
+           weatherInfoElement.textContent = weatherInfo;
+       }
+   };
+
+   // Call the function to update weather information
+   updateWeatherInfo();

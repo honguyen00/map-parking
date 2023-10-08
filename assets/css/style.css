@@ -10,6 +10,12 @@
     --river-bed: #48555B;
     --orange: #F38950;
     --whiskey: #E88553;
+    --white: white;
+    --darkgray: darkgray;
+    --black: black;
+    --charcoal: #444746;
+    --blue: #1183d6;
+    --gray-text: #bbb;
 }
 
 /* ================================================================ */
@@ -24,7 +30,7 @@ body {
     height: 100%;
     background-color: var(--gray-blue);
     margin: 0;
-    color: black;
+    color: var(--black);
 }
 
 header {
@@ -37,6 +43,7 @@ main {
     background-color: var(--gray);
 }
 
+
 a {
     font-size: 1.5rem;
 }
@@ -46,7 +53,7 @@ td {
 }
 
 header a:hover {
-    color: white;
+    color: var(--white);
     text-decoration: underline;
 }
 
@@ -79,7 +86,7 @@ side {
 }
 
 #search-bar #filter-Btn {
-    color: #444746;
+    color: var(--charcoal);
     overflow: hidden;
     min-width: 24px;
     min-height: 24px;
@@ -90,8 +97,8 @@ side {
 }
 
 #search-bar #filter-Btn:focus {
-    box-shadow: 0 0 3px 0 #1183d6;
-    border-color: #1183d6;
+    box-shadow: 0 0 3px 0 var(--blue);
+    border-color: var(--black);
     outline: none;
 }
 
@@ -111,13 +118,13 @@ input[type="text"] {
 }
 
 input[type="text"]:focus {
-    box-shadow: 0 0 3px 0 #1183d6;
-    border-color: #1183d6;
+    box-shadow: 0 0 3px 0 var(--blue);
+    border-color: var(--blue);
     outline: none;
 }
 
 input[type="text"]::placeholder {
-    color: #bbb;
+    color: var(--gray-text);
 }
 
 i {
@@ -161,8 +168,8 @@ tr:hover {
     border: 1px solid black;
     font-size: medium;
     padding: 0 0.5rem;
-    background-color: #fff;
-    color: black;
+    background-color: var(--white);
+    color: var(--black);
 }
 
 #infowindow {
@@ -199,4 +206,44 @@ tr:hover {
 
 .hide {
     display: none;
+}
+
+.history {
+    height: 310px;
+    top: 50px;
+    background-color: var(--gray);
+    width: 100%;
+    border-radius: 3px;
+    box-shadow: 1px 1px 0 2px var(--darkgray);
+    overflow: hidden;
+}
+
+/* .search-container:focus-within .history {
+    display: block;
+} */
+
+.history h2 {
+    font-size: 15px;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.historyItem {
+    display: flex;
+    align-items: center;
+}
+
+.history i {
+    padding-left: 10px;
+    font-size: 15px;
+}
+
+.history button {
+    font-size: 15px;
+    padding-left: 10px;
+    margin: 5px;
+}
+
+.history button:hover {
+color: var(--blue);
 }
