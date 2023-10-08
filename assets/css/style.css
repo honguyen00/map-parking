@@ -45,6 +45,7 @@ main {
     overflow: auto;
 }
 
+
 a {
     font-size: 1.5rem;
 }
@@ -62,6 +63,18 @@ h1:hover {
     cursor: pointer;
 }
 
+#addressInput {
+    width: 300px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#map {
+    height: 400px;
+    margin-top: 20px;
+}
+
+
 side {
     display: flex;
     flex-direction: column;
@@ -70,6 +83,7 @@ side {
 #map-container {
     height: 100%;
 }
+
 
 #search-bar {
     border: 1px solid currentColor;

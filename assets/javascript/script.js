@@ -9,6 +9,7 @@ var radius = 1000;
 var isOpen = false;
 var currentFocusedMarker;
 
+
 // run after loading all html elements
 $(function () {
     window.initMap = initMap;
@@ -55,6 +56,7 @@ async function initMap() {
         strictBounds: false,
         componentRestrictions: {country: "au"}
     };
+
     var input = $("#search-address");
     const autocomplete = new google.maps.places.Autocomplete(input[0], options);
     searchMarker = new google.maps.Marker();
@@ -70,6 +72,7 @@ async function initMap() {
                 handleLocationError(true, infoWindow, map.getCenter());
             }
         }
+
     })
     radius = 1000;
     showHistory();
@@ -181,6 +184,7 @@ function clearResultMarkers() {
     markers = [];
 }
 
+
 async function addResultsToMap(results, i) {
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
     results.forEach(result => {
@@ -228,7 +232,6 @@ function showParkingInfo() {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
         }
-        console.log(place);
         parkingIW.open(map, marker);
         map.panTo(marker.placeResult.geometry.location);
         map.setZoom(16);
@@ -243,13 +246,13 @@ function buildIWContent(place) {
     }
     var headDiv = $("<div class='mb-2'>")
     var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
-    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name  + "</a>");
+    var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name + "</a>");
     headDiv.append(placeIcon, placeName);
     var placeAddress = $("<p class='mb-2'><strong>Address:</strong> " + place.vicinity + "</p>");
     var placeOpen = $("<p class='mb-2'><strong>Availability:</strong> " + place.vicinity + "</p>")
     infoDiv.append(headDiv[0], placeAddress[0]);
-    addPhotos(place, infoDiv, function() {
-        addRatingandFeedback(place,infoDiv);
+    addPhotos(place, infoDiv, function () {
+        addRatingandFeedback(place, infoDiv);
     });
 }
 
@@ -292,14 +295,14 @@ function addRatingandFeedback(place, infoDiv) {
     var ratingHtml = "";
     var ratingLab = "<strong>Rating: </strong> ";
     if (place.rating) {
-        for (let i=0; i<5; i++) {
+        for (let i = 0; i < 5; i++) {
             if (place.rating < i + 0.5) {
                 ratingHtml += "&#10025;";
             }
             else {
                 ratingHtml += "&#10029;";
             }
-        } 
+        }
         ratingHtml += " (" + place.rating + ")";
     } else {
         ratingHtml = "(No ratings)"
@@ -328,7 +331,7 @@ function addRatingandFeedback(place, infoDiv) {
     infoDiv.append(ratingDiv, accessFeedbackDiv);
 }
 
-$('#infowindow').on("click",".like, .dislike", (event)=> {
+$('#infowindow').on("click", ".like, .dislike", (event) => {
     event.preventDefault();
     // $('.active').removeClass('active');
     // $(event.target).addClass('active');
@@ -534,4 +537,36 @@ historyEl.addEventListener("click", function () {
 
 window.initMap = initMap;
 
+//weather
+const apiKey = '0999ee04306ae06d9439492c7a4ecf1f';
+const city = 'Sydney'; 
 
+   // Function to get weather data from OpenWeatherMap API
+   const getWeatherData = async () => {
+       try {
+           const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+           const data = await response.json();
+           return data;
+       } catch (error) {
+           console.error('Error fetching weather data:', error);
+       }
+   };
+
+   // Function to update the weather information on the page
+   const updateWeatherInfo = async () => {
+       const weatherContainer = document.getElementById('weather-container');
+       const weatherInfoElement = document.getElementById('weather-info');
+
+       const weatherData = await getWeatherData();
+
+       if (weatherData) {
+           const temperature = weatherData.main.temp;
+           const description = weatherData.weather[0].description;
+
+           const weatherInfo = `Temperature: ${temperature}°C, ${description}`;
+           weatherInfoElement.textContent = weatherInfo;
+       }
+   };
+
+   // Call the function to update weather information
+   updateWeatherInfo();
