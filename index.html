@@ -50,37 +50,40 @@
                                     class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
                                     <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                                         <div class="sm:flex sm:items-start">
-                                            <div
+                                            <!-- <div
                                                 class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                                                 </svg>
-                                            </div>
+                                            </div> -->
                                             <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                                                 <h3 class="text-base font-semibold leading-6 text-gray-900"
-                                                    id="modal-title">Filter Options</h3>
+                                                    id="modal-title">Filter Options:</h3>
                                                 <div class="mt-2">
                                                     <div class="relative mt-6 flex-1 px-4 sm:px-6">
                                                         <div class="search-option" id="search-option">
-                                                            <input type="checkbox" id="free" name="free" value="free">
-                                                            <label for="free">Free Parking</label>
+                                                            <div class="flex items-center">
+                                                                <label class="mr-1">Availability:</label>
+                                                                <input type="radio" id="avail-all" name="availability" value="1" checked="checked">
+                                                                <label class="mr-2" for="avail-all">All</label>
+                                                                <input type="radio" id="open-now" name="availability" value="2">
+                                                                <label for="open-now">Open now</label>
+                                                            </div>
+                                                            <!-- <input type="checkbox" id="free" name="free" value="free"> -->
                                                             <br>
-                                                            <input type="checkbox" id="paid" name="paid" value="paid">
-                                                            <label for="paid">Paid Parking</label>
-                                                            <br>
-                                                            <input type="checkbox" id="accessible" name="accessible"
-                                                                value="accessible">
-                                                            <label for="paid">Accessible Parking</label>
-
-                                                            <p>How far are you willing to travel?</p>
-                                                            <input type="radio" id="five" name="radius" value="5km">
-                                                            <label for="5km">5km</label>
-                                                            <input type="radio" id="ten" name="radius" value="10km">
-                                                            <label for="10km">10km</label>
-                                                            <input type="radio" id="fiften" name="radius" value="15km">
-                                                            <label for="15km">15km</label>
-                                                            <input type="radio" id="twenty" name="radius" value="20km">
-                                                            <label for="20km">20km</label>
+                                                            <p>Search radius:</p>
+                                                            <div class="flex items-center">
+                                                                <input type="radio" id="1km" name="radius" value="1000" checked="checked">
+                                                                <label class="mr-2" for="1km">1km</label>
+                                                                <input type="radio" id="2km" name="radius" value="2000">
+                                                                <label class="mr-2" for="2km">2km</label>
+                                                                <input type="radio" id="3km" name="radius" value="3000">
+                                                                <label class="mr-2" for="3km">3km</label>
+                                                                <input type="radio" id="4km" name="radius" value="4000">
+                                                                <label class="mr-2" for="4km">4km</label>
+                                                                <input type="radio" id="5km" name="radius" value="5000">
+                                                                <label for="5km">5km</label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -88,9 +91,9 @@
                                         </div>
                                         <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                                             <button type="button"
-                                                class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto save-Btn">Save</button>
-                                            <button type="button"
-                                                class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cancel-Btn">Cancel</button>
+                                                class="inline-flex w-full justify-center rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto save-Btn">OK</button>
+                                            <!-- <button type="button"
+                                                class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto cancel-Btn">Cancel</button> -->
                                         </div>
                                     </div>
                                 </div>
