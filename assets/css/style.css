@@ -10,6 +10,8 @@
     --river-bed: #48555B;
     --orange: #F38950;
     --whiskey: #E88553;
+    --neon-blue: #2EBDD1;
+    --shuttle-gray: #566679;
     --white: white;
     --darkgray: darkgray;
     --black: black;
@@ -39,8 +41,8 @@ header {
 }
 
 main {
-    height: 86vh;
     background-color: var(--gray);
+    overflow: auto;
 }
 
 
@@ -74,14 +76,21 @@ h1:hover {
 
 
 side {
+    display: flex;
+    flex-direction: column;
     padding: 1rem 1.5rem 1rem 1.5rem;
+}
+#map-container {
+    height: 100%;
 }
 
 
 #search-bar {
     border: 1px solid currentColor;
-    border-radius: 8px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
     padding: 5px 60px 5px 5px;
+    box-shadow: 1px 1px 0 1px var(--darkgray);
     position: relative;
 }
 
@@ -139,21 +148,19 @@ strong {
     height: 100%;
     width: 100%;
     z-index: 1;
+    overflow: hidden;
+}
+
+section {
+    max-height: 100%;
+}
+
+.search-results {
+    overflow-y: scroll;
 }
 
 #results:hover {
     cursor: pointer;
-}
-
-#results {
-    margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
-}
-
-td {
-    overflow: hidden;
-    white-space: normal;
 }
 
 tr:hover {
@@ -161,8 +168,31 @@ tr:hover {
     text-decoration: underline;
 }
 
+tr:nth-child(odd) {
+    background-color: var(--wheat-field);
+    border-bottom: 1px solid black;
+}
+
+tr:nth-child(even) {
+    background-color: var(--shuttle-gray);
+    border-bottom: 1px solid black;
+    color: white;
+}
+
+#more {
+    background-color: var(--river-bed);
+    color: white;
+    height: 3rem;
+    font-size: 1.5rem;
+}
+
+#more[disabled='disabled'] {
+    background-color: var(--gray);
+    color: var(--shuttle-gray);
+}
+
 .custom-map-control-button {
-    height: 2rem;
+    height: 3.5rem;
     margin: 1rem;
     border-radius: 5px;
     border: 1px solid black;
@@ -183,7 +213,7 @@ tr:hover {
 }
 
 .streetview {
-    width: 500px;
+    width: 100%;
     height: 200px;
     margin: 0 auto;
 }
@@ -195,13 +225,8 @@ tr:hover {
     column-gap: 5px;
 }
 
-.dislike:hover, .like:hover {
-    color: #2EBDD1;
-    transition: all .2s ease-in-out;
-}
-
 .active {
-    color: #2EBDD1;
+    color: var(--neon-blue);
 }
 
 .hide {
@@ -209,22 +234,22 @@ tr:hover {
 }
 
 .history {
-    height: 310px;
-    top: 50px;
+    height: fit-content;
     background-color: var(--gray);
     width: 100%;
-    border-radius: 3px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
     box-shadow: 1px 1px 0 2px var(--darkgray);
     overflow: hidden;
+    position: absolute;
+    top: 34px;
+    left: 0px;
+    z-index: 5;
 }
-
-/* .search-container:focus-within .history {
-    display: block;
-} */
 
 .history h2 {
     font-size: 15px;
-    padding: 10px;
+    padding: 5px 5px 5px 10px;
     font-weight: bold;
 }
 
@@ -238,12 +263,12 @@ tr:hover {
     font-size: 15px;
 }
 
-.history button {
+.history a {
     font-size: 15px;
     padding-left: 10px;
     margin: 5px;
 }
 
-.history button:hover {
+.history a:hover {
 color: var(--blue);
 }
