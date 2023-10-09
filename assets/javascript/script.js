@@ -136,7 +136,7 @@ function getCurrentPos() {
             }
         );
     }
-    // if browser doesn't support built-in method to get user location, use geolocation api
+    //if browser doesn't support built-in method to get user location, use geolocation api
     else {
         fetch('https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyA5Zx1uReveYAhTFw1btOcdMgIMCY7GVNE', {method: 'POST'})
                 .then((data) => {
@@ -171,6 +171,8 @@ function createLocation(place) {
 
 // function to search parking around radius on double click
 async function searchParkingAroundRadius(position) {
+        clearResults();
+        clearResultMarkers();
         var location = position.latLng.toJSON();
         // search request
         const search = {
