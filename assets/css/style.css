@@ -54,6 +54,7 @@ td {
     font-size: 1.5rem;
 }
 
+/* ============header=========== */
 header a:hover {
     color: var(--white);
     text-decoration: underline;
@@ -63,27 +64,17 @@ h1:hover {
     cursor: pointer;
 }
 
-#addressInput {
-    width: 300px;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-#map {
-    height: 400px;
-    margin-top: 20px;
-}
-
-
+/* ============side panel========== */
 side {
     display: flex;
     flex-direction: column;
     padding: 1rem 1.5rem 1rem 1.5rem;
 }
-#map-container {
-    height: 100%;
+#addressInput {
+    width: 300px;
+    padding: 10px;
+    margin-bottom: 10px;
 }
-
 
 #search-bar {
     border: 1px solid currentColor;
@@ -144,17 +135,6 @@ strong {
     font-weight: bold !important;
 }
 
-#map {
-    height: 100%;
-    width: 100%;
-    z-index: 1;
-    overflow: hidden;
-}
-
-section {
-    max-height: 100%;
-}
-
 .search-results {
     overflow-y: scroll;
 }
@@ -190,6 +170,13 @@ tr:nth-child(even) {
     background-color: var(--gray);
     color: var(--shuttle-gray);
 }
+/* ======= map container =========== */
+#map {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
 
 .custom-map-control-button {
     height: 3.5rem;
@@ -200,6 +187,17 @@ tr:nth-child(even) {
     padding: 0 0.5rem;
     background-color: var(--white);
     color: var(--black);
+}
+
+#weather-info {
+    background-color: white;
+    opacity: 0.8;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 14px;
+    line-height: 14px;
+    font-size: 10px;
+    font-weight: 900;
 }
 
 #infowindow {
@@ -270,5 +268,5 @@ tr:nth-child(even) {
 }
 
 .history a:hover {
-color: var(--blue);
+    color: var(--blue);
 }

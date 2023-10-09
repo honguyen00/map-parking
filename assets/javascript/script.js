@@ -8,6 +8,9 @@ var searchMarker;
 var radius = 1000;
 var isOpen = false;
 var currentFocusedMarker;
+//weather
+const apiKey = '0999ee04306ae06d9439492c7a4ecf1f';
+const city = 'Sydney'; 
 
 
 // run after loading all html elements
@@ -35,9 +38,14 @@ async function initMap() {
     // assign infoWindow, this is to show any extra information in a pop-up window in the map
     infoWindow = new google.maps.InfoWindow();
     // create a custom button to zoom in user's location 
-    const currentLocationButton = $("<button class='custom-map-control-button'>Current location</button>")
-    // add the cumstom button to the top center of the map
+    const currentLocationButton = $("<button class='custom-map-control-button'>Current location</button>");
+    // var currentweatherCon = $("<div id='weather-container' class='text-right'></div>");
+    // var weatherInfo = $("<p id='weather-info' class='text-sm font-medium'></p>");
+    var weatherCon = $("#weather-info")
+    // add the cumstom button to the top left of the map
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(currentLocationButton[0]);
+    // add custion weather info to the center of the map
+    map.controls[google.maps.ControlPosition.TOP_CENTER].push(weatherCon[0]);
     // add listener to the custom button, function getCurrentPos
     currentLocationButton.on("click", getCurrentPos);
     // declare service, this is to have access to PlacesService api to get methods such as search nearby, find place etc..
@@ -48,6 +56,7 @@ async function initMap() {
             event.stop();
         }
     });
+    // declare our parking info window
     parkingIW = new google.maps.InfoWindow({
         content: document.getElementById("infowindow")
     })
@@ -58,14 +67,16 @@ async function initMap() {
     };
 
     var input = $("#search-address");
+    // google autocomplete api
     const autocomplete = new google.maps.places.Autocomplete(input[0], options);
     searchMarker = new google.maps.Marker();
     $(".search-icon").on("click", (event) => {
         event.preventDefault();
         if(input.val() != "") {
             if (typeof autocomplete.getPlace() != typeof undefined) {
-                createLocation(autocomplete.getPlace().geometry.location);
-                saveHitory(autocomplete.getPlace().geometry.location);
+                var location = {lat: autocomplete.getPlace().geometry.location.lat(), lng: autocomplete.getPlace().geometry.location.lng()}
+                createLocation(location);
+                saveHitory(location);
                 input.val("");
             }
             else {
@@ -74,9 +85,35 @@ async function initMap() {
         }
 
     })
-    radius = 1000;
+    // declare search history elements
     showHistory();
 }
+
+// Function to get weather data from OpenWeatherMap API
+const getWeatherData = async (url) => {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+    }
+};
+
+// Function to update the weather information on the page
+const updateWeatherInfo = async (location) => {
+    const weatherInfoElement = $('#weather-info');
+    weatherInfoElement[0].classList.remove('hide');
+    const weatherData = await getWeatherData(`https://api.openweathermap.org/data/2.5/weather?lat=${location.lat}&lon=${location.lng}&appid=${apiKey}&units=metric`);
+    if (weatherData) {
+        const temperature = weatherData.main.temp;
+        const description = weatherData.weather[0].description;
+
+        const weatherInfo = `Temperature: ${temperature}°C, ${description}`;
+        weatherInfoElement[0].textContent = weatherInfo;
+    }
+};
+
 
 // function to get the current position of user from the browser
 function getCurrentPos() {
@@ -99,17 +136,29 @@ function getCurrentPos() {
             }
         );
     }
-    // if browser doesn't support built-in method to get user location
+    // if browser doesn't support built-in method to get user location, use geolocation api
     else {
-        handleLocationError(false, infoWindow, map.getCenter());
+        fetch('https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyA5Zx1uReveYAhTFw1btOcdMgIMCY7GVNE', {method: 'POST'})
+                .then((data) => {
+                    data.json().then((data) => {
+                        createLocation(data.location);
+                    })
+                })
+                .catch((error) => {
+                    handleLocationError(false, infoWindow, map.getCenter());
+        })
     }
 }
 
 function createLocation(place) {
     if (!place) return;
+    // clear all previous results
     clearResults();
     clearSearchMarker();
     clearResultMarkers();
+    // Call the function to update weather information
+    updateWeatherInfo(place);
+    // zoom in location
     map.panTo(place);
     map.setZoom(12)
     searchMarker = new google.maps.Marker({
@@ -120,29 +169,37 @@ function createLocation(place) {
     searchMarker.addListener("dblclick", searchParkingAroundRadius, { passive: true })
 }
 
+// function to search parking around radius on double click
 async function searchParkingAroundRadius(position) {
         var location = position.latLng.toJSON();
+        // search request
         const search = {
             location: { lat: location["lat"], lng: location["lng"] },
             radius: radius,
             keyword: "parking lot",
             openNow: isOpen,
         };
+        // load more result button
         var moreButton = $("#more");
         let getNextPage;
         moreButton.on("click", function() {
+            // disable button
             moreButton.attr("disabled", true)
+            // check if there is more results
             if (getNextPage) {
                 getNextPage();
             }
         }) 
         var i = 0;
+        // google service nearby search
         service.nearbySearch(search, (results, status, pagination) => {
             if (status === google.maps.places.PlacesServiceStatus.OK && results) { 
             addResultsToMap(results, i);
+            // if there is next page, enable load more button
             moreButton.attr("disabled", (!pagination || !pagination.hasNextPage));
             if (pagination && pagination.hasNextPage) {
                 getNextPage = () => {
+                    // repeat the initial call if there is next page
                     pagination.nextPage();
                     i += 20;
                 }
@@ -155,6 +212,7 @@ async function searchParkingAroundRadius(position) {
         map.setZoom(14);
     }
 
+// function to display error message in the center of the map
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
     infoWindow.setContent(
@@ -165,16 +223,17 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.open(map);
 }
 
-
+// function to set the map for marker
 function dropMarker(i) {
     return function () {
         markers[i].setMap(map);
     }
 }
+// function to clear the searched location marker
 function clearSearchMarker() {
     searchMarker.setMap(null);
 }
-
+// function to clear the searched parking markers
 function clearResultMarkers() {
     for (let i = 0; i < markers.length; i++) {
         if (markers[i]) {
@@ -184,11 +243,12 @@ function clearResultMarkers() {
     markers = [];
 }
 
-
+// function to add parking results as custom markers to the map
 async function addResultsToMap(results, i) {
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
     results.forEach(result => {
         var markerNumber = i+1;
+        // customize marker
         const pinBackground = new PinElement({
             background: "#031cfc",
             borderColor: "white",
@@ -203,12 +263,14 @@ async function addResultsToMap(results, i) {
 
         markers[i].placeResult = result;
         google.maps.event.addListener(markers[i], "click", showParkingInfo)
+        // drop animation
         setTimeout(dropMarker(i), i*100);
         addResultsToDiv(result, i);
         i++;
     });
 }
 
+// function to add parking results to the result div
 function addResultsToDiv(result, i) {
         var markerNumber = i+1;
         const rowEle = $("<tr>");
@@ -220,25 +282,32 @@ function addResultsToDiv(result, i) {
         resultTable.append(rowEle);
 }
 
-
+// function to clear the result div
 function clearResults() {
     resultTable.empty();
 }
 
+// function to display infowindow of parking on click
 function showParkingInfo() {
     currentFocusedMarker = this;
     const marker = this;
+    // google service get details info of location
     service.getDetails({ placeId: marker.placeResult.place_id }, (place, status) => {
         if (status !== google.maps.places.PlacesServiceStatus.OK) {
             return;
         }
+        // display parking infowindow
         parkingIW.open(map, marker);
         map.panTo(marker.placeResult.geometry.location);
-        map.setZoom(16);
+        if (map.getZoom() < 16) {
+            map.setZoom(16);
+        }
+        // fill content of parking infowindow
         buildIWContent(place); 
     });
 }
 
+//function to append elements and info to parking info window div 
 function buildIWContent(place) {
     var infoDiv = $("#infowindow");
     if (infoDiv.children()) {
@@ -256,6 +325,7 @@ function buildIWContent(place) {
     });
 }
 
+// function to get the street view of the parking location
 function addPhotos(place, infoDiv, callback) {
     var sv = new google.maps.StreetViewService();
     var direction = new google.maps.DirectionsService();
@@ -291,6 +361,7 @@ function addPhotos(place, infoDiv, callback) {
     })
 }
 
+// callback function to add rating and feedback div only after finish loading street view
 function addRatingandFeedback(place, infoDiv) {
     var ratingHtml = "";
     var ratingLab = "<strong>Rating: </strong> ";
@@ -331,6 +402,7 @@ function addRatingandFeedback(place, infoDiv) {
     infoDiv.append(ratingDiv, accessFeedbackDiv);
 }
 
+// event listener for when users send feedback 
 $('#infowindow').on("click", ".like, .dislike", (event) => {
     event.preventDefault();
     // $('.active').removeClass('active');
@@ -347,7 +419,6 @@ $('#infowindow').on("click", ".like, .dislike", (event) => {
         downcount++;
         downcountEle[0].textContent = downcount;
     }
-    // ===================================================================================================
     var localStorageItem = {location: savedLocation, up: upcount, down: downcount};
     var feedback = JSON.parse(localStorage.getItem("feedback")) || [];
     if (feedback.find((item) => {if (JSON.stringify(item.location) === JSON.stringify(savedLocation)) {
@@ -362,6 +433,7 @@ $('#infowindow').on("click", ".like, .dislike", (event) => {
     localStorage.setItem("feedback", JSON.stringify(feedback));          
 })
 
+// effect when users click on thumbs up or down
 $('#infowindow').on("mousedown",".like, .dislike", (event)=> {
     $(event.target).addClass('active');
 })
@@ -370,6 +442,7 @@ $('#infowindow').on("mouseup",".like, .dislike", (event)=> {
     $('.active').removeClass('active');
 })
 
+// function to handle when users hover over a result from result div
 async function hightlightMarker(event) {
     if (event.target.tagName == 'TD') {
         var i = $(event.target).parent().index();
@@ -401,6 +474,7 @@ async function hightlightMarker(event) {
     }
 }
 
+// event listener for hovering over result
 resultTable.on("mouseover", hightlightMarker)
 resultTable.on("mouseout", hightlightMarker)
 
@@ -518,7 +592,7 @@ searchValueEl.addEventListener('focusin', function () {
 searchValueEl.addEventListener('focusout', function () {
     setTimeout(() => {
         historyEl.classList.add('hide');
-    }, 100)
+    }, 400)
 })
 
 // Adding a keyboard event listener so that when user types anything in the search bar, the autocomplete function will kick in instead of search history
@@ -536,37 +610,3 @@ historyEl.addEventListener("click", function () {
 
 
 window.initMap = initMap;
-
-//weather
-const apiKey = '0999ee04306ae06d9439492c7a4ecf1f';
-const city = 'Sydney'; 
-
-   // Function to get weather data from OpenWeatherMap API
-   const getWeatherData = async () => {
-       try {
-           const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
-           const data = await response.json();
-           return data;
-       } catch (error) {
-           console.error('Error fetching weather data:', error);
-       }
-   };
-
-   // Function to update the weather information on the page
-   const updateWeatherInfo = async () => {
-       const weatherContainer = document.getElementById('weather-container');
-       const weatherInfoElement = document.getElementById('weather-info');
-
-       const weatherData = await getWeatherData();
-
-       if (weatherData) {
-           const temperature = weatherData.main.temp;
-           const description = weatherData.weather[0].description;
-
-           const weatherInfo = `Temperature: ${temperature}°C, ${description}`;
-           weatherInfoElement.textContent = weatherInfo;
-       }
-   };
-
-   // Call the function to update weather information
-   updateWeatherInfo();
