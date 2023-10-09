@@ -310,9 +310,7 @@ function showParkingInfo() {
 //function to append elements and info to parking info window div 
 function buildIWContent(place) {
     var infoDiv = $("#infowindow");
-    if (infoDiv.children()) {
-        infoDiv.empty();
-    }
+    infoDiv.empty();
     var headDiv = $("<div class='mb-2'>")
     var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
     var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name + "</a>");
