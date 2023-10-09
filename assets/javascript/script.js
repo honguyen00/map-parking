@@ -45,7 +45,7 @@ async function initMap() {
     // add the cumstom button to the top left of the map
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(currentLocationButton[0]);
     // add custion weather info to the center of the map
-    map.controls[google.maps.ControlPosition.TOP_CENTER].push(weatherCon[0]);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(weatherCon[0]);
     // add listener to the custom button, function getCurrentPos
     currentLocationButton.on("click", getCurrentPos);
     // declare service, this is to have access to PlacesService api to get methods such as search nearby, find place etc..
@@ -310,9 +310,7 @@ function showParkingInfo() {
 //function to append elements and info to parking info window div 
 function buildIWContent(place) {
     var infoDiv = $("#infowindow");
-    if (infoDiv.children()) {
-        infoDiv.empty();
-    }
+    infoDiv.empty();
     var headDiv = $("<div class='mb-2'>")
     var placeIcon = $("<img class='parkingIcon inline-block'" + "style='background-color:" + place.icon_background_color + "'" + "src='" + place.icon + "'>");
     var placeName = $("<a class='font-bold' href=" + place.url + " target='_blank'>" + place.name + "</a>");
