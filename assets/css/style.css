@@ -194,9 +194,9 @@ tr:nth-child(even) {
     opacity: 0.8;
     padding-left: 6px;
     padding-right: 6px;
-    height: 14px;
-    line-height: 14px;
-    font-size: 10px;
+    height: 25px;
+    line-height: 25px;
+    font-size: 20px;
     font-weight: 900;
 }
 
