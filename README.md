@@ -6,10 +6,16 @@ Park with Access App was born out of a collective desire to address the challeng
 
 The Park with Access App is not just a project; it's a commitment to making urban mobility more accessible and enjoyable for everyone.
 
+Click on the link to access our live site: https://honguyen00.github.io/map-parking/
+
 ## Installation 
 N/A
 
 ## Usage
+Landing page:<br>
+<p align="center" width="100%">
+    <img width="50%" src="./assets/images/demo-image.png"> 
+</p>
 
     - Search for a designated location
     Open the web application and input your desired location in the search bar. We have implemented autocomplete feature to make searching for location more intuitive. On search button click, a marker will appear on the map, marking the searched location.

@@ -45,7 +45,7 @@ async function initMap() {
     // add the cumstom button to the top left of the map
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(currentLocationButton[0]);
     // add custion weather info to the center of the map
-    map.controls[google.maps.ControlPosition.TOP_CENTER].push(weatherCon[0]);
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push(weatherCon[0]);
     // add listener to the custom button, function getCurrentPos
     currentLocationButton.on("click", getCurrentPos);
     // declare service, this is to have access to PlacesService api to get methods such as search nearby, find place etc..

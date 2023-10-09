@@ -194,10 +194,12 @@ tr:nth-child(even) {
     opacity: 0.8;
     padding-left: 6px;
     padding-right: 6px;
-    height: 25px;
-    line-height: 25px;
-    font-size: 20px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 16px;
     font-weight: 900;
+    left: 10px !important;
+    top: 55px !important;
 }
 
 #infowindow {
