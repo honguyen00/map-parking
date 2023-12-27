@@ -166,6 +166,13 @@ function createLocation(place) {
         position: place,
         animation: google.maps.Animation.DROP,
     });
+    const new_infoWindow = new google.maps.InfoWindow({
+        content: "Double click to search nearby",
+    });
+    new_infoWindow.open({
+        anchor: searchMarker,
+        map
+    })
     searchMarker.addListener("dblclick", searchParkingAroundRadius, { passive: true })
 }
 
